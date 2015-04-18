@@ -10,6 +10,8 @@ import android.view.View;
 
 public class SurvivorGamesMenu extends ActionBarActivity {
 
+    //Same changes
+
     public final static String EXTRA_MESSAGE = "com.series.survivor.MESSAGE";
 
     @Override
