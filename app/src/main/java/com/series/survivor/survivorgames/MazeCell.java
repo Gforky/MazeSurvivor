@@ -12,26 +12,21 @@ import javax.microedition.khronos.opengles.GL10;
  * Wall Cell in the MazeSurvivor game
  * size of 2 * 2 pixels
  */
-public class MazeWall {
+public class MazeCell {
 
     private final FloatBuffer vertexBuffer;
     private final ShortBuffer drawListBuffer;
 
     //number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 3;
-    static float cellCoords[] = {
-            -0.5f, 0.5f, 0.0f,//top left
-            -0.5f, -0.5f, 0.0f,//bottom left
-            0.5f, -0.5f, 0.0f,//bottom right
-            0.5f, 0.5f, 0.0f};//top right
+    static float cellCoords[];//stores the four vertices of the cell
     //order to draw the vertices
     private final short drawOrder[] = {0, 1, 2, 0, 2, 3};
 
-    // Set color with red, green, blue and alpha (opacity) values
-    float color[] = { 0.2f, 0.709803922f, 0.898039216f, 1.0f };
-
     //Constructor
-    public MazeWall() {
+    public MazeCell(float[] cellCoords) {
+
+        this.cellCoords = cellCoords;
 
         //initialize vertex byte buffer for cell coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(
@@ -55,7 +50,7 @@ public class MazeWall {
     }
 
     //wall cell's drawing logic
-    public void draw(GL10 gl) {
+    public void draw(GL10 gl, float[] color) {
 
         //This cell uses vertex array, enable them
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);

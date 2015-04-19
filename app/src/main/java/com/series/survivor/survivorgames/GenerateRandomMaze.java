@@ -7,6 +7,18 @@ package com.series.survivor.survivorgames;
  * 'p' means available path, 'w' means walls
  */
 public class GenerateRandomMaze {
+
+    //Inner class to store the cell type and the vertices coordinates of the cell
+    static class Cell {
+        public final char Type;
+        public final float[] coords;
+
+        public Cell(char Type, float[] coords) {
+            this.Type = Type;
+            this.coords = coords;
+        }
+
+    }
     public char[][] generateMaze(int row, int col) {
         //using char matrix to save space
         if(row < 1 || col < 1) {//Sanity check
