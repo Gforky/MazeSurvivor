@@ -3,7 +3,9 @@ package com.series.survivor.survivorgames;
 /**
  * Created by Malvin on 4/18/2015.
  * Generate a random maze with size M * N (M and N are both even numbers)
+ * the start point is the survivor's current position in the maze
  * for any cell in the maze, there is one and only one path between them
+ * the exit is the cell with the max cost to the survivor
  * 'p' means available path, 'w' means walls, 's' means the survivor, 'e' means exit
  */
 public class GenerateRandomMaze {
@@ -23,7 +25,7 @@ public class GenerateRandomMaze {
     private int[] exitCell = new int[2];//record the cell indices of exit in the maze
     private float ratio;//The screen's height and width ratio
 
-    public Cell[][] generateMaze(int row, int col, float ratio) {//main function to generate the maze
+    public Cell[][] generateMaze(int row, int col, float ratio, int startX, int startY) {//main function to generate the maze
 
         this.ratio = ratio;
         //Initialize the maze cells
@@ -38,9 +40,6 @@ public class GenerateRandomMaze {
         if(row < 1 || col < 1) {//Sanity check
             return null;
         }
-        //Randomly choose a start point in maze
-        int startX = (int)(Math.random() * (row - 1));
-        int startY = (int) (Math.random() * (col - 1));
 
         //initialize the maze
         float temp = leftMost;//temporally store the left most X coordinate
@@ -62,11 +61,10 @@ public class GenerateRandomMaze {
                 leftMost += sideLengthX;//move to next column of the maze
             }
             upMost -= sideLengthY;//move to next row of the maze
-            leftMost = temp;
+            leftMost = temp;//reset column to the first column
         }
         generate(maze, startX, startY, 0);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
-        System.out.println("HERE IS THE RATIO: " + ratio + "!!!!");
         return maze;
     }
 
