@@ -4,28 +4,35 @@ package com.series.survivor.survivorgames;
  * Created by Malvin on 4/18/2015.
  * Generate a random maze with size M * N (M and N are both even numbers)
  * for any cell in the maze, there is one and only one path between them
- * 'p' means available path, 'w' means walls
+ * 'p' means available path, 'w' means walls, 's' means the survivor, 'e' means exit
  */
 public class GenerateRandomMaze {
 
     //Inner class to store the cell type and the vertices coordinates of the cell
     static class Cell {
         public char Type;
-        public float[] coords;
+        public MazeCell mazeCell;
 
-        public Cell(char Type, float[] coords) {
+        public Cell(char Type, MazeCell mazeCell) {
             this.Type = Type;
-            this.coords = coords;
+            this.mazeCell = mazeCell;
         }
     }
 
-    public Cell[][] generateMaze(int row, int col) {
+    private int maxCost = Integer.MIN_VALUE;//record the global max cost from a path cell to the survivor
+    private int[] exitCell = new int[2];//record the cell indices of exit in the maze
+    private float ratio;//The screen's height and width ratio
 
+    public Cell[][] generateMaze(int row, int col, float ratio) {//main function to generate the maze
+
+        this.ratio = ratio;
         //Initialize the maze cells
         Cell[][] maze = new Cell[row][col];//store the cells in maze
         //get the upper left corner vertex's X and Y coordinates
-        float leftMost = -((row / 2) * 0.01f);
-        float upMost = (col / 2) * 0.01f;
+        float leftMost = -1;
+        float upMost = ratio;//set the height of the maze at the same size as width
+        float sideLengthX = 2 / (float)row;//length of side of one cell at X coordinate
+        float sideLengthY = sideLengthX * ratio;//length of side of one cell at Y coordinate
 
         //using char matrix to save space
         if(row < 1 || col < 1) {//Sanity check
@@ -41,28 +48,30 @@ public class GenerateRandomMaze {
             for(int c = 0; c < col; c++) {
                 //initialize the corresponding cells
                 if(r == startX && c == startY) {//initially only set the start point as available path
-                    maze[r][c] = new Cell('p', null);//p as "path"
+                    maze[r][c] = new Cell('s', null);//p as "path"
                 } else {//set all the other cells as walls
                     maze[r][c] = new Cell('w', null);//w as "wall"
                 }
                 //set the four vertices of the cell
-                maze[r][c].coords = new float[]{
+                maze[r][c].mazeCell = new MazeCell(new float[]{
                         leftMost, upMost, 0.0f,//top left
-                        leftMost, upMost - 0.02f, 0.0f,//bottom left
-                        leftMost + 0.02f, upMost - 0.02f, 0.0f,//bottom right
-                        leftMost + 0.02f, upMost, 0.0f//top right
-                };
-                leftMost += 0.02f;//move to next column of the maze
+                        leftMost, upMost - sideLengthY, 0.0f,//bottom left
+                        leftMost + sideLengthX, upMost - sideLengthY, 0.0f,//bottom right
+                        leftMost + sideLengthX, upMost, 0.0f//top right
+                });
+                leftMost += sideLengthX;//move to next column of the maze
             }
-            upMost -= 0.02f;//move to next row of the maze
+            upMost -= sideLengthY;//move to next row of the maze
             leftMost = temp;
         }
-        generate(maze, startX, startY);//generate a maze with the matrix and start point
+        generate(maze, startX, startY, 0);//generate a maze with the matrix and start point
+        maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
+        System.out.println("HERE IS THE RATIO: " + ratio + "!!!!");
         return maze;
     }
 
     //Recursion: at each level, move the path two steps to a random direction, if valid
-    private void generate(Cell[][] maze, int X, int Y) {
+    private void generate(Cell[][] maze, int X, int Y, int localMax) {
         Dir[] dirs = Dir.values();//get the array of four directions
         shuffle(dirs);//shuffle the order of the directions, in order to move to random direction at each level
         for(Dir dir : dirs) {//try every direction, check whether can move to
@@ -71,8 +80,15 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
+                //when move the second step, check whether the cell can be set as the exit, and temporarily record the indices of the cell
+                if(localMax + 2 > maxCost) {//find a larger cost path to the survivor, set the cell as exit
+                    //update the exit indices and global max cost
+                    exitCell[0] = nextX;
+                    exitCell[1] = nextY;
+                    maxCost = localMax + 2;
+                }
                 maze[nextX][nextY].Type = 'p';
-                generate(maze, nextX, nextY);//continue generate the path from the new cell
+                generate(maze, nextX, nextY, localMax + 2);//continue generate the path from the new cell
             }//end-if
         }//end-for
     }
@@ -90,7 +106,7 @@ public class GenerateRandomMaze {
 
     //check if the destination cell is valid to move to
     private boolean valid(Cell[][] maze, int x, int y) {
-        if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type != 'p') {//cell is with the maze, and is not be dig yet
+        if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type == 'w') {//cell is with the maze, and is not be dig yet
             return true;
         }
         return false;
