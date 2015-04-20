@@ -1,6 +1,7 @@
 package com.series.survivor.survivorgames;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -12,9 +13,19 @@ public class MazeSurvivorActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Receive the message from SurvivorGamesMenu Activity
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(SurvivorGamesMenu.EXTRA_MESSAGE);
+        //convert string to int
+        int size = 0;
+        char[] array = message.toCharArray();
+        for(int index = 0; index < array.length; index++) {
+            size += ((array[index] - '0') * Math.pow(10, array.length - 1));
+        }
         //Create an instance of GLSurfaceView
         //and set it as the content view
-        myGLView = new MazeSurvivorView(this);
+        myGLView = new MazeSurvivorView(this, size, size);
         setContentView(myGLView);
     }
 

@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 
 public class SurvivorGamesMenu extends ActionBarActivity {
@@ -45,7 +46,8 @@ public class SurvivorGamesMenu extends ActionBarActivity {
     public void sendMessage(View view) {
         //Do something here in response to the button
         Intent intent = new Intent(this, MazeSurvivorActivity.class);
-        String message = "Hello World!";//message to send to MazeSurvivorActivity
+        EditText editText = (EditText) findViewById(R.id.maze_size);
+        String message = editText.getText().toString();//message to send to MazeSurvivorActivity
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }

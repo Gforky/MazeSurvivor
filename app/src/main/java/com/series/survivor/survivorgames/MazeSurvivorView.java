@@ -12,10 +12,15 @@ import android.view.WindowManager;
 public class MazeSurvivorView extends GLSurfaceView {
 
     private final MazeSurvivorRenderer myRenderer;
+    //maze's row and column
+    private int row;
+    private int col;
 
-    public MazeSurvivorView(Context context) {
+    public MazeSurvivorView(Context context, int row, int col) {
         super(context);
 
+        this.row = row;
+        this.col = col;
         //get the screen's width and height ratio
         WindowManager manager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
@@ -25,7 +30,7 @@ public class MazeSurvivorView extends GLSurfaceView {
         float height = size.y;
         float ratio = width / height;
 
-        myRenderer = new MazeSurvivorRenderer(ratio, 40, 40);
+        myRenderer = new MazeSurvivorRenderer(ratio, row, col);
 
         //set myRenderer as the renderer for the GLSurfaceView
         setRenderer(myRenderer);
