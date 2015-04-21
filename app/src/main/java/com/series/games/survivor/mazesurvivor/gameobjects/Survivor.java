@@ -10,10 +10,11 @@ public class Survivor {
     private int indexX;
     private int indexY;
 
-    public Survivor(int indexX, int indexY) {
+    public Survivor(int row, int col) {
 
-        this.indexX = indexX;
-        this.indexY = indexY;
+        //Randomly set a start point in maze
+        this.indexX = (int)(Math.random() * (row - 1));
+        this.indexY = (int) (Math.random() * (col - 1));
     }
 
     public int getX() {

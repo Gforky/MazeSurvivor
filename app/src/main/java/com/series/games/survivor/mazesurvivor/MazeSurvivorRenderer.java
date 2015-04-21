@@ -25,16 +25,15 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //Set the startTime of a maze
     private long startTime;
 
-    //start point in maze
-    private int startX;
-    private int startY;
-
     //numbers of row and column of the maze
     int row;
     int col;
 
     //Player object
     private Survivor survivor;
+
+    //record the status of the player, if the player find the exit, set it to true
+    private boolean findExit;
 
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col) {
@@ -43,10 +42,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         startTime = SystemClock.uptimeMillis();
         this.row = row;
         this.col = col;
-        //Randomly set a start point in maze
-        startX = (int)(Math.random() * (row - 1));
-        startY = (int) (Math.random() * (col - 1));
-        survivor = new Survivor(startX, startY);
+        survivor = new Survivor(row, col);
+        findExit = false;
     }
 
     //All 3 colors needed to draw the maze
@@ -76,7 +73,12 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         drawMaze(gl);
 
-        if((SystemClock.uptimeMillis() - startTime) / (1000L * row) > 0) {//change the maze around every 10 seconds
+        if(findExit) {//player run out of current maze, create a new maze for the player
+            findExit = false;//set the boolean flag to false
+            survivor = new Survivor(row, col);
+            maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());//generate a new M * N maze
+            startTime = SystemClock.uptimeMillis();//reset the start time
+        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * row) > 0) {//player still in current maze, change the maze around every (maze row) seconds
             startTime = SystemClock.uptimeMillis();
             maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());
         }
@@ -105,6 +107,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             case "LEFT":
                 int moveLeft = Dir.LEFT.moveY(survivor.getY());
                 if(moveLeft >=0 && maze[survivor.getX()][moveLeft].Type != 'w') {
+                    if(maze[survivor.getX()][moveLeft].Type == 'e') {
+                        findExit = true;
+                    }
                     maze[survivor.getX()][survivor.getY()].Type = 'p';
                     survivor.updateY(moveLeft);
                     maze[survivor.getX()][survivor.getY()].Type = 's';
@@ -113,6 +118,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             case "RIGHT":
                 int moveRight = Dir.RIGHT.moveY(survivor.getY());
                 if(moveRight < row && maze[survivor.getX()][moveRight].Type != 'w') {
+                    if(maze[survivor.getX()][moveRight].Type == 'e') {
+                        findExit = true;
+                    }
                     maze[survivor.getX()][survivor.getY()].Type = 'p';
                     survivor.updateY(moveRight);
                     maze[survivor.getX()][survivor.getY()].Type = 's';
@@ -121,6 +129,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             case "UP":
                 int moveUp = Dir.UP.moveX(survivor.getX());
                 if(moveUp >= 0 && maze[moveUp][survivor.getY()].Type != 'w') {
+                    if(maze[moveUp][survivor.getY()].Type == 'e') {
+                        findExit = true;
+                    }
                     maze[survivor.getX()][survivor.getY()].Type = 'p';
                     survivor.updateX(moveUp);
                     maze[survivor.getX()][survivor.getY()].Type = 's';
@@ -129,6 +140,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             case "DOWN":
                 int moveDown = Dir.DOWN.moveX(survivor.getX());
                 if(moveDown < col && maze[moveDown][survivor.getY()].Type != 'w') {
+                    if(maze[moveDown][survivor.getY()].Type == 'e') {
+                        findExit = true;
+                    }
                     maze[survivor.getX()][survivor.getY()].Type = 'p';
                     survivor.updateX(moveDown);
                     maze[survivor.getX()][survivor.getY()].Type = 's';

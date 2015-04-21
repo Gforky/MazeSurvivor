@@ -84,7 +84,7 @@ public class GenerateRandomMaze {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
                 maze[nextX][nextY].Type = 'p';
                 generate(maze, nextX, nextY, localMax + 2);//continue generate the path from the new cell
-            }else {//check whether the cell can be set as the exit, and temporarily record the indices of the cell
+            } else {//check whether the cell can be set as the exit, and temporarily record the indices of the cell
                 if(localMax > maxCost) {//find a larger cost path to the survivor, set the cell as exit
                     //update the exit indices and global max cost
                     exitCell[0] = X;

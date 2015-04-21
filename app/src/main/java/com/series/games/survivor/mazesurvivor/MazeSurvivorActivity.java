@@ -52,7 +52,6 @@ public class MazeSurvivorActivity extends Activity {
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        System.out.println(""+ x + " " + y);
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
                 if(x < 500 && y > 500 && y < 1400) {
