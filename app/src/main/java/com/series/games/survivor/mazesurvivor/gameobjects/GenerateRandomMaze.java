@@ -35,8 +35,8 @@ public class GenerateRandomMaze {
         //Initialize the maze cells
         Cell[][] maze = new Cell[row][col];//store the cells in maze
         //get the upper left corner vertex's X and Y coordinates
-        float leftMost = -1;
-        float upMost = ratio;//set the height of the maze at the same size as width
+        float leftMost = -1;//set the min X coordinate as the initial X
+        float upMost = ratio;//set the height of the maze as the same size as width
         float sideLengthX = 2 / (float)row;//length of side of one cell at X coordinate
         float sideLengthY = sideLengthX * ratio;//length of side of one cell at Y coordinate
 

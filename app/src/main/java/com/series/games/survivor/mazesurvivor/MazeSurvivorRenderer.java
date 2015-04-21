@@ -35,15 +35,47 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //record the status of the player, if the player find the exit, set it to true
     private boolean findExit;
 
+    //four control buttons
+    private MazeCell upButton;
+    private MazeCell downButton;
+    private MazeCell leftButton;
+    private MazeCell rightButton;
+
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col) {
         //Initializations
         this.ratio = ratio;
         startTime = SystemClock.uptimeMillis();
-        this.row = row;
-        this.col = col;
+        //control the corner case as the player enter 0 as initial size
+        this.row = row == 0 ? 4 : row;
+        this.col = col == 0 ? 4 : col;
         survivor = new Survivor(row, col);
         findExit = false;
+
+        leftButton = new MazeCell(new float[] {
+                -1.0f, -ratio, 0.0f,//top left
+                -1.0f, -1.0f, 0.0f,//bottom left
+                -1.0f / 3.0f, -1.0f, 0.0f,//bottom right
+                -1.0f / 3.0f, -ratio, 0.0f//top right
+        });
+        rightButton = new MazeCell(new float[] {
+                1.0f / 3.0f, -ratio, 0.0f,//top left
+                1.0f / 3.0f, -1.0f, 0.0f,//bottom left
+                1.0f, -1.0f, 0.0f,//bottom right
+                1.0f, -ratio, 0.0f//top right
+        });
+        upButton = new MazeCell(new float[] {
+                -1.0f / 3.0f, -ratio, 0.0f,//top left
+                -1.0f / 3.0f, -(1.0f + ratio) / 2.0f, 0.0f,//bottom left
+                1.0f / 3.0f, -(1.0f + ratio) / 2.0f, 0.0f,//bottom right
+                1.0f / 3.0f, -ratio, 0.0f//top right
+        });
+        downButton = new MazeCell(new float[] {
+                -1.0f / 3.0f, -(1.0f + ratio) / 2.0f, 0.0f,//top left
+                -1.0f / 3.0f, -1.0f, 0.0f,//bottom left
+                1.0f / 3.0f, -1.0f, 0.0f,//bottom right
+                1.0f / 3.0f, -(1.0f + ratio) / 2.0f, 0.0f//top right
+        });
     }
 
     //All 3 colors needed to draw the maze
@@ -72,9 +104,14 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
         drawMaze(gl);
+        drawButtons(gl);
 
         if(findExit) {//player run out of current maze, create a new maze for the player
             findExit = false;//set the boolean flag to false
+            //enlarge the maze's size to increase the difficulty of the game
+            row += 2;
+            col += 2;
+            //reset the player and re-generate the maze
             survivor = new Survivor(row, col);
             maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());//generate a new M * N maze
             startTime = SystemClock.uptimeMillis();//reset the start time
@@ -99,6 +136,13 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 }
             }
         }
+    }
+
+    private void drawButtons(GL10 gl) {//draw operation buttons
+        leftButton.draw(gl, new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+        rightButton.draw(gl, new float[]{1.0f, 1.0f, 0.0f, 1.0f});
+        upButton.draw(gl, new float[]{1.0f, 0.0f, 1.0f, 1.0f});
+        downButton.draw(gl, new float[]{0.0f, 1.0f, 1.0f, 1.0f});
     }
 
     //update the survivor position according to the touch event

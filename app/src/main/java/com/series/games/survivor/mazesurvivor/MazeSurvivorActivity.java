@@ -20,8 +20,9 @@ public class MazeSurvivorActivity extends Activity {
     private float screenWidth;
     private float screenHeight;
     private float ratio;
-    private float buttonUpBound;
-    private float buttonBottomBound;
+    private float buttonLeftBorder;
+    private float buttonRightBorder;
+    private float buttonMidBorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,12 @@ public class MazeSurvivorActivity extends Activity {
         //convert string to int
         int size = 0;
         char[] array = message.toCharArray();
-        for(int index = 0; index < array.length; index++) {
-            size += ((array[index] - '0') * Math.pow(10, array.length - 1));
+        if(array == null || array.length == 0) {//if no initial size has been set, set it to 4
+            size = 4;
+        } else {//get the initial size from menu activity
+            for (int index = 0; index < array.length; index++) {
+                size += ((array[index] - '0') * Math.pow(10, array.length - 1));
+            }
         }
 
         //get the screen's width and height ratio
@@ -46,8 +51,9 @@ public class MazeSurvivorActivity extends Activity {
         screenHeight = point.y;
         ratio = screenWidth / screenHeight;
 
-        buttonUpBound = (screenHeight - screenWidth) / 2 + screenWidth / 3;
-        buttonBottomBound = (screenHeight - screenWidth) / 2 + screenWidth * 2 / 3;
+        buttonLeftBorder = screenWidth / 3;
+        buttonRightBorder = screenWidth * 2 / 3;
+        buttonMidBorder = (screenHeight + screenWidth) / 2 + (screenHeight - screenWidth) / 4;
 
         //Create an instance of GLSurfaceView
         //and set it as the content view
@@ -76,13 +82,13 @@ public class MazeSurvivorActivity extends Activity {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
-                if(x < screenWidth / 2 && y > buttonUpBound && y < buttonBottomBound) {
+                if(x < buttonLeftBorder) {
                     myGLView.myRenderer.updateSurvivor("LEFT");
-                } else if(x > screenWidth / 2 && y > buttonUpBound && y < buttonBottomBound) {
+                } else if(x > buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("RIGHT");
-                } else if(y < buttonUpBound) {
+                } else if(y < buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("UP");
-                } else if(y > buttonBottomBound) {
+                } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
                 }
             case MotionEvent.ACTION_MOVE:
