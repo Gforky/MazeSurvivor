@@ -17,11 +17,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MazeSurvivorActivity"
+            android:name="com.series.games.survivor.mazesurvivor.MazeSurvivorActivity"
             android:label="@string/title_activity_maze_survivor" >
         </activity>
         <activity
-            android:name=".SurvivorGamesMenu"
+            android:name="com.series.games.survivor.SurvivorGamesMenu"
             android:label="@string/title_activity_survivor_games_menu" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

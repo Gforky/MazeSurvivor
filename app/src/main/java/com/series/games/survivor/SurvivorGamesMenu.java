@@ -1,4 +1,4 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+
+import com.series.games.survivor.mazesurvivor.MazeSurvivorActivity;
+import com.series.survivor.survivorgames.R;
 
 
 public class SurvivorGamesMenu extends ActionBarActivity {

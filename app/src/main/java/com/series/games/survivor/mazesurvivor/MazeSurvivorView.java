@@ -1,4 +1,4 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor.mazesurvivor;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -11,7 +11,7 @@ import android.view.WindowManager;
  */
 public class MazeSurvivorView extends GLSurfaceView {
 
-    private final MazeSurvivorRenderer myRenderer;
+    public final MazeSurvivorRenderer myRenderer;
     //maze's row and column
     private int row;
     private int col;

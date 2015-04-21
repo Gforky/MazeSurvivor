@@ -1,4 +1,4 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor.mazesurvivor.gameobjects;
 
 /**
  * Created by Malvin on 4/18/2015.
@@ -11,7 +11,7 @@ package com.series.survivor.survivorgames;
 public class GenerateRandomMaze {
 
     //Inner class to store the cell type and the vertices coordinates of the cell
-    static class Cell {
+    public static class Cell {
         public char Type;
         public MazeCell mazeCell;
 
@@ -21,13 +21,17 @@ public class GenerateRandomMaze {
         }
     }
 
-    private int maxCost = Integer.MIN_VALUE;//record the global max cost from a path cell to the survivor
+    private int maxCost;//record the global max cost from a path cell to the survivor
     private int[] exitCell = new int[2];//record the cell indices of exit in the maze
     private float ratio;//The screen's height and width ratio
 
     public Cell[][] generateMaze(int row, int col, float ratio, int startX, int startY) {//main function to generate the maze
 
+        //Initialize the max cost as minimum int
+        maxCost = Integer.MIN_VALUE;
+
         this.ratio = ratio;
+
         //Initialize the maze cells
         Cell[][] maze = new Cell[row][col];//store the cells in maze
         //get the upper left corner vertex's X and Y coordinates
@@ -78,16 +82,16 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                //when move the second step, check whether the cell can be set as the exit, and temporarily record the indices of the cell
-                if(localMax + 2 > maxCost) {//find a larger cost path to the survivor, set the cell as exit
-                    //update the exit indices and global max cost
-                    exitCell[0] = nextX;
-                    exitCell[1] = nextY;
-                    maxCost = localMax + 2;
-                }
                 maze[nextX][nextY].Type = 'p';
                 generate(maze, nextX, nextY, localMax + 2);//continue generate the path from the new cell
-            }//end-if
+            }else {//check whether the cell can be set as the exit, and temporarily record the indices of the cell
+                if(localMax > maxCost) {//find a larger cost path to the survivor, set the cell as exit
+                    //update the exit indices and global max cost
+                    exitCell[0] = X;
+                    exitCell[1] = Y;
+                    maxCost = localMax;
+                }
+            }
         }//end-for
     }
 

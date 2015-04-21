@@ -1,9 +1,13 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor.mazesurvivor;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+
+import com.series.games.survivor.SurvivorGamesMenu;
+import com.series.survivor.survivorgames.R;
 
 
 public class MazeSurvivorActivity extends Activity {
@@ -42,5 +46,29 @@ public class MazeSurvivorActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        System.out.println(""+ x + " " + y);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
+                if(x < 500 && y > 500 && y < 1400) {
+                    myGLView.myRenderer.updateSurvivor("LEFT");
+                } else if(x > 500 && y > 500 && y < 1400) {
+                    myGLView.myRenderer.updateSurvivor("RIGHT");
+                } else if(y < 500) {
+                    myGLView.myRenderer.updateSurvivor("UP");
+                } else if(y > 1400) {
+                    myGLView.myRenderer.updateSurvivor("DOWN");
+                }
+            case MotionEvent.ACTION_MOVE:
+
+            case MotionEvent.ACTION_UP:
+
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor.mazesurvivor.gameobjects;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

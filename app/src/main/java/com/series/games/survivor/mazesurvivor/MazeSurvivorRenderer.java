@@ -1,9 +1,9 @@
-package com.series.survivor.survivorgames;
+package com.series.games.survivor.mazesurvivor;
 
 import android.opengl.GLSurfaceView;
 import android.os.SystemClock;
 
-import java.util.Calendar;
+import com.series.games.survivor.mazesurvivor.gameobjects.*;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -22,31 +22,31 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //The screen's height and width ratio
     private float ratio;
 
-    //The Calendar instance to get the system time
-    private Calendar calendar;
-
     //Set the startTime of a maze
-    long startTime;
+    private long startTime;
 
     //start point in maze
-    int startX;
-    int startY;
+    private int startX;
+    private int startY;
 
     //numbers of row and column of the maze
     int row;
     int col;
 
+    //Player object
+    private Survivor survivor;
+
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col) {
         //Initializations
         this.ratio = ratio;
-        calendar = Calendar.getInstance();
         startTime = SystemClock.uptimeMillis();
         this.row = row;
         this.col = col;
         //Randomly set a start point in maze
         startX = (int)(Math.random() * (row - 1));
         startY = (int) (Math.random() * (col - 1));
+        survivor = new Survivor(startX, startY);
     }
 
     //All 3 colors needed to draw the maze
@@ -64,7 +64,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         mazeGenerator = new GenerateRandomMaze();
 
         //Get the maze from generator
-        maze = mazeGenerator.generateMaze(row, col, ratio, startX, startY);//generate a M * N maze
+        maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());//generate a M * N maze
 
         //set the background frame color
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -76,9 +76,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         drawMaze(gl);
 
-        if((SystemClock.uptimeMillis() - startTime) / 5000L > 0) {//change the maze around every 10 seconds
+        if((SystemClock.uptimeMillis() - startTime) / (1000L * row) > 0) {//change the maze around every 10 seconds
             startTime = SystemClock.uptimeMillis();
-            maze = mazeGenerator.generateMaze(row, col, ratio, startX, startY);
+            maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());
         }
     }
 
@@ -96,6 +96,44 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                     maze[r][c].mazeCell.draw(gl, exitColor);
                 }
             }
+        }
+    }
+
+    //update the survivor position according to the touch event
+    public void updateSurvivor(String move) {
+        switch(move) {
+            case "LEFT":
+                int moveLeft = Dir.LEFT.moveY(survivor.getY());
+                if(moveLeft >=0 && maze[survivor.getX()][moveLeft].Type != 'w') {
+                    maze[survivor.getX()][survivor.getY()].Type = 'p';
+                    survivor.updateY(moveLeft);
+                    maze[survivor.getX()][survivor.getY()].Type = 's';
+                }
+                break;
+            case "RIGHT":
+                int moveRight = Dir.RIGHT.moveY(survivor.getY());
+                if(moveRight < row && maze[survivor.getX()][moveRight].Type != 'w') {
+                    maze[survivor.getX()][survivor.getY()].Type = 'p';
+                    survivor.updateY(moveRight);
+                    maze[survivor.getX()][survivor.getY()].Type = 's';
+                }
+                break;
+            case "UP":
+                int moveUp = Dir.UP.moveX(survivor.getX());
+                if(moveUp >= 0 && maze[moveUp][survivor.getY()].Type != 'w') {
+                    maze[survivor.getX()][survivor.getY()].Type = 'p';
+                    survivor.updateX(moveUp);
+                    maze[survivor.getX()][survivor.getY()].Type = 's';
+                }
+                break;
+            case "DOWN":
+                int moveDown = Dir.DOWN.moveX(survivor.getX());
+                if(moveDown < col && maze[moveDown][survivor.getY()].Type != 'w') {
+                    maze[survivor.getX()][survivor.getY()].Type = 'p';
+                    survivor.updateX(moveDown);
+                    maze[survivor.getX()][survivor.getY()].Type = 's';
+                }
+                break;
         }
     }
 
