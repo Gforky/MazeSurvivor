@@ -1,10 +1,14 @@
 package com.series.games.survivor.mazesurvivor;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 import com.series.games.survivor.SurvivorGamesMenu;
 import com.series.survivor.survivorgames.R;
@@ -13,6 +17,11 @@ import com.series.survivor.survivorgames.R;
 public class MazeSurvivorActivity extends Activity {
 
     private MazeSurvivorView myGLView;
+    private float screenWidth;
+    private float screenHeight;
+    private float ratio;
+    private float buttonUpBound;
+    private float buttonBottomBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +36,22 @@ public class MazeSurvivorActivity extends Activity {
         for(int index = 0; index < array.length; index++) {
             size += ((array[index] - '0') * Math.pow(10, array.length - 1));
         }
+
+        //get the screen's width and height ratio
+        WindowManager manager = (WindowManager)this.getSystemService(Context.WINDOW_SERVICE);
+        Display display = manager.getDefaultDisplay();
+        Point point= new Point();
+        display.getSize(point);
+        screenWidth = point.x;
+        screenHeight = point.y;
+        ratio = screenWidth / screenHeight;
+
+        buttonUpBound = (screenHeight - screenWidth) / 2 + screenWidth / 3;
+        buttonBottomBound = (screenHeight - screenWidth) / 2 + screenWidth * 2 / 3;
+
         //Create an instance of GLSurfaceView
         //and set it as the content view
-        myGLView = new MazeSurvivorView(this, size, size);
+        myGLView = new MazeSurvivorView(this, size, size, ratio);
         setContentView(myGLView);
     }
 
@@ -50,17 +72,17 @@ public class MazeSurvivorActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int)event.getX();
-        int y = (int)event.getY();
+        float x = event.getX();
+        float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
-                if(x < 500 && y > 500 && y < 1400) {
+                if(x < screenWidth / 2 && y > buttonUpBound && y < buttonBottomBound) {
                     myGLView.myRenderer.updateSurvivor("LEFT");
-                } else if(x > 500 && y > 500 && y < 1400) {
+                } else if(x > screenWidth / 2 && y > buttonUpBound && y < buttonBottomBound) {
                     myGLView.myRenderer.updateSurvivor("RIGHT");
-                } else if(y < 500) {
+                } else if(y < buttonUpBound) {
                     myGLView.myRenderer.updateSurvivor("UP");
-                } else if(y > 1400) {
+                } else if(y > buttonBottomBound) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
                 }
             case MotionEvent.ACTION_MOVE:
