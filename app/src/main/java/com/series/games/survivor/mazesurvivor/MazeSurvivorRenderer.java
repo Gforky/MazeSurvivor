@@ -41,6 +41,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     private MazeCell leftButton;
     private MazeCell rightButton;
 
+    //boolean flag to record whether the maze is in change or not
+    private boolean inChange;
+
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col) {
         //Initializations
@@ -51,6 +54,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         this.col = col == 0 ? 4 : col;
         survivor = new Survivor(row, col);
         findExit = false;
+        inChange = false;
 
         leftButton = new MazeCell(new float[] {
                 -1.0f, -ratio, 0.0f,//top left
@@ -115,9 +119,12 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             survivor = new Survivor(row, col);
             maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());//generate a new M * N maze
             startTime = SystemClock.uptimeMillis();//reset the start time
-        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * row) > 0) {//player still in current maze, change the maze around every (maze row) seconds
+        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * mazeGenerator.getMaxCost() / 5) > 0) {
+            //player still in current maze, change the maze around every (maze row) seconds
+            inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
             startTime = SystemClock.uptimeMillis();
             maze = mazeGenerator.generateMaze(row, col, ratio, survivor.getX(), survivor.getY());
+            inChange = false;//free the player
         }
     }
 
@@ -150,7 +157,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         switch(move) {
             case "LEFT":
                 int moveLeft = Dir.LEFT.moveY(survivor.getY());
-                if(moveLeft >=0 && maze[survivor.getX()][moveLeft].Type != 'w') {
+                if(!inChange && moveLeft >=0 && maze[survivor.getX()][moveLeft].Type != 'w') {
+                    //maze is not in change, and can move to the new cell
                     if(maze[survivor.getX()][moveLeft].Type == 'e') {
                         findExit = true;
                     }
@@ -161,7 +169,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 break;
             case "RIGHT":
                 int moveRight = Dir.RIGHT.moveY(survivor.getY());
-                if(moveRight < row && maze[survivor.getX()][moveRight].Type != 'w') {
+                if(!inChange && moveRight < row && maze[survivor.getX()][moveRight].Type != 'w') {
+                    //maze is not in change, and can move to the new cell
                     if(maze[survivor.getX()][moveRight].Type == 'e') {
                         findExit = true;
                     }
@@ -172,7 +181,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 break;
             case "UP":
                 int moveUp = Dir.UP.moveX(survivor.getX());
-                if(moveUp >= 0 && maze[moveUp][survivor.getY()].Type != 'w') {
+                if(!inChange && moveUp >= 0 && maze[moveUp][survivor.getY()].Type != 'w') {
+                    //maze is not in change, and can move to the new cell
                     if(maze[moveUp][survivor.getY()].Type == 'e') {
                         findExit = true;
                     }
@@ -183,7 +193,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 break;
             case "DOWN":
                 int moveDown = Dir.DOWN.moveX(survivor.getX());
-                if(moveDown < col && maze[moveDown][survivor.getY()].Type != 'w') {
+                if(!inChange && moveDown < col && maze[moveDown][survivor.getY()].Type != 'w') {
+                    //maze is not in change, and can move to the new cell
                     if(maze[moveDown][survivor.getY()].Type == 'e') {
                         findExit = true;
                     }

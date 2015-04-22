@@ -113,4 +113,10 @@ public class GenerateRandomMaze {
         }
         return false;
     }
+
+    //get the cost from exit to the survivor
+    public int getMaxCost() {
+
+        return maxCost;
+    }
 }

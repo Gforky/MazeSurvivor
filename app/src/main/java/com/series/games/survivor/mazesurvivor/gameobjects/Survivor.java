@@ -33,6 +33,7 @@ public class Survivor {
     }
 
     public void updateY(int newY) {
-         indexY = newY;
+
+        indexY = newY;
     }
 }
