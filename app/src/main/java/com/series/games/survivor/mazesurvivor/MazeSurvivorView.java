@@ -24,7 +24,7 @@ public class MazeSurvivorView extends GLSurfaceView {
 
         this.ratio = ratio;
 
-        myRenderer = new MazeSurvivorRenderer(ratio, row, col);
+        myRenderer = new MazeSurvivorRenderer(ratio, row, col, context);
 
         //set myRenderer as the renderer for the GLSurfaceView
         setRenderer(myRenderer);

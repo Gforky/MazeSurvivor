@@ -1,9 +1,17 @@
 package com.series.games.survivor.mazesurvivor;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 import android.os.SystemClock;
 
-import com.series.games.survivor.mazesurvivor.gameobjects.*;
+import com.series.games.survivor.mazesurvivor.gameobjects.Dir;
+import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
+import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
+import com.series.games.survivor.mazesurvivor.gameobjects.Survivor;
+import com.series.survivor.survivorgames.R;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -16,9 +24,6 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //Storage to store the cell information in the maze, 'w' mean wall, 'p' means path, 's' means survivor
     MazeWorld mazeWorld;
     MazeWorld.Cell[][] maze;
-
-    //The screen's height and width ratio
-    private float ratio;
 
     //Set the startTime of a maze
     private long startTime;
@@ -39,10 +44,22 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //boolean flag to record whether the maze is in change or not
     private boolean inChange;
 
+    private Context context;
+
+    //texture Ids used for drawing maze
+    private int wallTexture;
+    private int pathTexture;
+    private int survivorTexture;
+    private int exitTexture;
+    private int leftButtonTexture;
+    private int rightButtonTexture;
+    private int upButtonTexture;
+    private int downButtonTexture;
+
     //Constructor
-    public MazeSurvivorRenderer(float ratio, int row, int col) {
+    public MazeSurvivorRenderer(float ratio, int row, int col, Context context) {
         //Initializations
-        this.ratio = ratio;
+        this.context = context;
 
         //control the corner case as the player enter 0 as initial size
         this.row = row == 0 ? 4 : row;
@@ -64,19 +81,30 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         startTime = SystemClock.uptimeMillis();
     }
 
-    //All 3 colors needed to draw the maze
-    private final float[] wallColor =  new float[]{1.0f, 0.0f, 0.0f, 1.0f };
-
-    private final float[] pathColor = new float[]{0.0f, 1.0f, 0.0f, 1.0f};
-
-    private final float[] survivorColor = new float[]{0.0f, 0.0f, 1.0f, 1.0f};
-
-    private final float[] exitColor = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
-
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
+        //Enable texture
+        gl.glEnable(GL10.GL_TEXTURE_2D);
+        //Enable Smooth Shading
+        gl.glShadeModel(GL10.GL_SMOOTH);
+        //Depth Buffer Setup
+        gl.glClearDepthf(1.0f);
+        //Enables Depth Testing
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        //The Type Of Depth Testing To Do
+        gl.glDepthFunc(GL10.GL_LEQUAL);
         //set the background frame color
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+        //load the textures used for drawing maze, load the texture once, and bind it to GL_TEXTURE_2D when render
+        wallTexture = loadTexture(gl, context, R.drawable.brick_wall);
+        pathTexture = loadTexture(gl, context, R.drawable.grass);
+        survivorTexture = loadTexture(gl, context, R.drawable.survivor);
+        exitTexture = loadTexture(gl, context, R.drawable.exit);
+        leftButtonTexture = loadTexture(gl, context, R.drawable.leftbutton);
+        rightButtonTexture = loadTexture(gl, context, R.drawable.rightbutton);
+        upButtonTexture = loadTexture(gl, context, R.drawable.upbutton);
+        downButtonTexture = loadTexture(gl, context, R.drawable.downbutton);
     }
 
     public void onDrawFrame(GL10 gl) {
@@ -124,26 +152,33 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         for(int r = 0; r < row; r++) {
             for(int c = 0; c < col; c++) {
                 if(maze[r][c].Type == 'w') {//draw the wall cell
-                    maze[r][c].mazeCell.draw(gl, wallColor);
+                    maze[r][c].mazeCell.draw(gl, wallTexture);
                 } else if(maze[r][c].Type == 'p') {//draw the path cell
-                    maze[r][c].mazeCell.draw(gl, pathColor);
+                    maze[r][c].mazeCell.draw(gl, pathTexture);
                 } else if(maze[r][c].Type == 's') {//draw the survivor
-                    maze[r][c].mazeCell.draw(gl, survivorColor);
+                    maze[r][c].mazeCell.draw(gl, survivorTexture);
                 } else if(maze[r][c].Type == 'e') {//draw the exit
-                    maze[r][c].mazeCell.draw(gl, exitColor);
+                    maze[r][c].mazeCell.draw(gl, exitTexture);
                 }
             }
         }
     }
 
+    /**Function to draw the direction control buttons
+     *
+     * @param gl
+     */
     private void drawButtons(GL10 gl) {//draw operation buttons
-        dirButtons.leftButton.draw(gl, new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-        dirButtons.rightButton.draw(gl, new float[]{1.0f, 1.0f, 0.0f, 1.0f});
-        dirButtons.upButton.draw(gl, new float[]{1.0f, 0.0f, 1.0f, 1.0f});
-        dirButtons.downButton.draw(gl, new float[]{0.0f, 1.0f, 1.0f, 1.0f});
+        dirButtons.leftButton.draw(gl, leftButtonTexture);
+        dirButtons.rightButton.draw(gl, rightButtonTexture);
+        dirButtons.upButton.draw(gl, upButtonTexture);
+        dirButtons.downButton.draw(gl, downButtonTexture);
     }
 
-    //update the survivor position according to the touch event
+    /**Update the survivor position according to the touch event
+     *
+     * @param move
+     */
     public void updateSurvivor(String move) {
         switch(move) {
             case "LEFT":
@@ -195,6 +230,49 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 }
                 break;
         }
+    }
+
+    /**Function to load the textures
+     *
+     * @param gl
+     * @param context
+     * @param resourceId
+     * @return
+     */
+    public static int loadTexture(GL10 gl, final Context context, final int resourceId)
+    {
+        final int[] textureHandle = new int[1];
+
+        gl.glGenTextures(1, textureHandle, 0);
+
+        if (textureHandle[0] != 0 )
+        {
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false;   // No pre-scaling
+
+            // Read in the resource
+            final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+
+            // Bind to the texture in OpenGL
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandle[0]);
+
+            // Set filtering
+            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+
+            // Load the bitmap into the bound texture.
+            GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+
+            // Recycle the bitmap, since its data has been loaded into OpenGL.
+            bitmap.recycle();
+        }
+
+        if (textureHandle[0] == 0)
+        {
+            throw new RuntimeException("Error loading texture.");
+        }
+
+        return textureHandle[0];
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
