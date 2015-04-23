@@ -18,7 +18,7 @@ public class MazeCell {
     private final ShortBuffer drawListBuffer;
 
     //number of coordinates per vertex in this array
-    static final int COORDS_PER_VERTEX = 3;
+    static final int COORDS_PER_VERTEX = 2;
     static float cellCoords[];//stores the four vertices of the cell
     //order to draw the vertices
     private final short drawOrder[] = {0, 1, 2, 0, 2, 3};
