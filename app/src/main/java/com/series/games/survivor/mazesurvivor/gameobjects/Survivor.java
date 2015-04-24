@@ -28,7 +28,7 @@ public class Survivor {
         switch(move) {
             case "LEFT":
                 int moveLeft = Dir.LEFT.moveY(indexY);
-                if(!inChange && moveLeft >=0 && maze[indexX][moveLeft].Type != 'w') {
+                if(!inChange && moveLeft >= 0 && (maze[indexX][moveLeft].Type == 'p' || maze[indexX][moveLeft].Type == 'e')) {
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateY(moveLeft);
@@ -40,7 +40,7 @@ public class Survivor {
                 break;
             case "RIGHT":
                 int moveRight = Dir.RIGHT.moveY(indexY);
-                if(!inChange && moveRight < row && maze[indexX][moveRight].Type != 'w') {
+                if(!inChange && moveRight < row && (maze[indexX][moveRight].Type == 'p' || maze[indexX][moveRight].Type == 'e')) {
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateY(moveRight);
@@ -52,7 +52,7 @@ public class Survivor {
                 break;
             case "UP":
                 int moveUp = Dir.UP.moveX(indexX);
-                if(!inChange && moveUp >= 0 && maze[moveUp][indexY].Type != 'w') {
+                if(!inChange && moveUp >= 0 && (maze[moveUp][indexY].Type == 'p' || maze[moveUp][indexY].Type == 'e')) {
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateX(moveUp);
@@ -64,7 +64,7 @@ public class Survivor {
                 break;
             case "DOWN":
                 int moveDown = Dir.DOWN.moveX(indexX);
-                if(!inChange && moveDown < col && maze[moveDown][indexY].Type != 'w') {
+                if(!inChange && moveDown < col && (maze[moveDown][indexY].Type == 'p' || maze[moveDown][indexY].Type == 'e')) {
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateX(moveDown);

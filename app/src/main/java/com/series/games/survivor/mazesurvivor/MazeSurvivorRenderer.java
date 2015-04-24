@@ -112,7 +112,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.wallTexture,
                 gameTextures.pathTexture,
                 gameTextures.survivorTexture,
-                gameTextures.exitTexture
+                gameTextures.exitTexture,
+                gameTextures.monsterTexture,
+                inChange
         );
         scoreBoard.drawScoreBoard(gl,
                 gameTextures.lvSymbolTexture,

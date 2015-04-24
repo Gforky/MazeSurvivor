@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import android.os.SystemClock;
+
 import javax.microedition.khronos.opengles.GL10;
 
 /**
@@ -90,7 +92,7 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, startX, startY);
+        mazeGenerator.generateMaze(maze, startX, startY, 1);
         return maze;
     }
 
@@ -128,8 +130,12 @@ public class MazeWorld {
      *
      * @param gl
      */
-    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int exitTexture) {//draw maze function
+    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture,
+                         int exitTexture, int monsterTexture, boolean inChange) {
+        //Update the monsters' positions
+        updateMonsters(inChange);
 
+        //draw maze function
         for(int r = 0; r < row; r++) {
             for(int c = 0; c < col; c++) {
                 if(maze[r][c].Type == 'w') {//draw the wall cell
@@ -140,8 +146,22 @@ public class MazeWorld {
                     maze[r][c].mazeCell.draw(gl, survivorTexture);
                 } else if(maze[r][c].Type == 'e') {//draw the exit
                     maze[r][c].mazeCell.draw(gl, exitTexture);
+                } else if(maze[r][c].Type == 'm') {//draw monsters
+                    maze[r][c].mazeCell.draw(gl, monsterTexture);
                 }
             }
+        }
+    }
+
+    /**Update the monsters' positions
+     *
+     * @param inChange
+     */
+    private void updateMonsters(boolean inChange) {
+
+        for(Monster monster : mazeGenerator.getMonsters()) {
+
+            monster.move(maze, SystemClock.uptimeMillis(), inChange);
         }
     }
 

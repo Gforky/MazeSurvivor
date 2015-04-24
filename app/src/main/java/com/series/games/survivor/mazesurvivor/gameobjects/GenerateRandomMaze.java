@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import android.os.SystemClock;
+
 /**
  * Created by Malvin on 4/18/2015.
  * Generate a random maze with size M * N (M and N are both even numbers)
@@ -13,27 +15,34 @@ public class GenerateRandomMaze {
     private int maxCost;//record the global max cost from a path cell to the survivor
     private int[] exitCell = new int[2];//record the cell indices of exit in the maze
     private MazeWorld.Cell[][] maze;//Currently used maze
+    private int row;//maze's row number
+    private int col;//maze's column number
+    private int maxNumOfMonster;//Max num of monsters that move in the maze
+    private Monster[] monsters;//store all the monsters
 
-    public void generateMaze(MazeWorld.Cell[][] maze, int startX, int startY) {//main function to generate the maze
+    public void generateMaze(MazeWorld.Cell[][] maze, int startX, int startY, int maxNumOfMonster) {//main function to generate the maze
 
         //Initialize the maze
         this.maze = maze;
+        this.row = maze.length;
+        this.col = maze[0].length;
 
         //Initialize the max cost as minimum int
         maxCost = Integer.MIN_VALUE;
 
-        generatePath(maze, startX, startY, 0);//generate a maze with the matrix and start point
+        this.maxNumOfMonster = maxNumOfMonster;
+        monsters = new Monster[maxNumOfMonster];
+        generatePath(startX, startY, 0);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
     }
 
     /**Recursion: at each level, move the path two steps to a random direction, if valid
      *
-     * @param maze
      * @param X
      * @param Y
      * @param localMax
      */
-    private void generatePath(MazeWorld.Cell[][] maze, int X, int Y, int localMax) {
+    private void generatePath(int X, int Y, int localMax) {
         Dir[] dirs = Dir.values();//get the array of four directions
         shuffle(dirs);//shuffle the order of the directions, in order to move to random direction at each level
         for(Dir dir : dirs) {//try every direction, check whether can move to
@@ -42,8 +51,16 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                maze[nextX][nextY].Type = 'p';
-                generatePath(maze, nextX, nextY, localMax + 2);//continue generate the path from the new cell
+                if(localMax > 10 && maxNumOfMonster > 0) {//Can create monster, and the cost to the survivor is larger than 10
+
+                    maze[nextX][nextY].Type = 'm';//set the cell as monster
+                    //create a monster by using current coordinates
+                    monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis(), row, col);
+                    maxNumOfMonster--;//decrease the available number of monsters by 1
+                } else {
+                    maze[nextX][nextY].Type = 'p';
+                }
+                generatePath(nextX, nextY, localMax + 2);//continue generate the path from the new cell
             } else {//check whether the cell can be set as the exit, and temporarily record the indices of the cell
                 if(localMax > maxCost) {//find a larger cost path to the survivor, set the cell as exit
                     //update the exit indices and global max cost
@@ -78,5 +95,11 @@ public class GenerateRandomMaze {
     public int getMaxCost() {
 
         return maxCost;
+    }
+
+    //get the array of monsters
+    public Monster[] getMonsters() {
+
+        return monsters;
     }
 }
