@@ -20,8 +20,10 @@ public class MazeSurvivorActivity extends Activity {
     private float screenWidth;
     private float screenHeight;
     private float ratio;
+    //borders of direction control buttons' touch areas
     private float buttonLeftBorder;
     private float buttonRightBorder;
+    private float buttonUpBorder;
     private float buttonMidBorder;
 
     @Override
@@ -53,6 +55,7 @@ public class MazeSurvivorActivity extends Activity {
 
         buttonLeftBorder = screenWidth / 3;
         buttonRightBorder = screenWidth * 2 / 3;
+        buttonUpBorder = (screenHeight + screenWidth) / 2;
         buttonMidBorder = (screenHeight + screenWidth) / 2 + (screenHeight - screenWidth) / 4;
 
         //Create an instance of GLSurfaceView
@@ -82,11 +85,11 @@ public class MazeSurvivorActivity extends Activity {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
-                if(x < buttonLeftBorder) {
+                if(x < buttonLeftBorder && y > buttonUpBorder) {
                     myGLView.myRenderer.updateSurvivor("LEFT");
-                } else if(x > buttonRightBorder) {
+                } else if(x > buttonRightBorder && y > buttonUpBorder) {
                     myGLView.myRenderer.updateSurvivor("RIGHT");
-                } else if(y < buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
+                } else if(y < buttonMidBorder && y > buttonUpBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("UP");
                 } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
