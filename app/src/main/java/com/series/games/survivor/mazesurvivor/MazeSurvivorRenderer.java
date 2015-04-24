@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import com.series.games.survivor.mazesurvivor.gameobjects.Dir;
 import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
+import com.series.games.survivor.mazesurvivor.gameobjects.ScoreBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.Survivor;
 import com.series.survivor.survivorgames.R;
 
@@ -38,13 +39,20 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //Direction buttons
     private DirButtons dirButtons;
 
+    //ScoreBoard
+    private ScoreBoard scoreBoard;
+
     //record the status of the player, if the player find the exit, set it to true
     private boolean findExit;
 
     //boolean flag to record whether the maze is in change or not
     private boolean inChange;
 
+    //Context get from the MazeSurvivorActivity
     private Context context;
+
+    //record the game levels
+    private int gameLevel;
 
     //texture Ids used for drawing maze
     private int wallTexture;
@@ -55,6 +63,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     private int rightButtonTexture;
     private int upButtonTexture;
     private int downButtonTexture;
+    private int lvSymbolTexture;
+    private int numTextures[];
+
 
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col, Context context) {
@@ -68,6 +79,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         findExit = false;
         inChange = false;
 
+        //set the initial game level
+        gameLevel = (row - 2) / 2;
+
         //Initialize the maze
         mazeWorld = new MazeWorld(row, col, ratio, survivor.getX(), survivor.getY());
 
@@ -76,6 +90,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         //Initialize direction buttons
         dirButtons = mazeWorld.getDirButtons();
+
+        //Initialize ScoreBoard
+        scoreBoard = new ScoreBoard(ratio);
 
         //set the game start time for current round
         startTime = SystemClock.uptimeMillis();
@@ -105,14 +122,28 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         rightButtonTexture = loadTexture(gl, context, R.drawable.rightbutton);
         upButtonTexture = loadTexture(gl, context, R.drawable.upbutton);
         downButtonTexture = loadTexture(gl, context, R.drawable.downbutton);
+        lvSymbolTexture = loadTexture(gl, context, R.drawable.lvsymbol);
+        numTextures = new int[]{
+                loadTexture(gl, context, R.drawable.num0),
+                loadTexture(gl, context, R.drawable.num1),
+                loadTexture(gl, context, R.drawable.num2),
+                loadTexture(gl, context, R.drawable.num3),
+                loadTexture(gl, context, R.drawable.num4),
+                loadTexture(gl, context, R.drawable.num5),
+                loadTexture(gl, context, R.drawable.num6),
+                loadTexture(gl, context, R.drawable.num7),
+                loadTexture(gl, context, R.drawable.num8),
+                loadTexture(gl, context, R.drawable.num9)
+        };
     }
 
     public void onDrawFrame(GL10 gl) {
         //Redraw background color
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        //draw the maze and direction buttons
+        //draw all the elements on the game interface
         drawMaze(gl);
+        drawScoreBoard(gl);
         drawButtons(gl);
 
         if(findExit) {//player run out of current maze, create a new maze for the player
@@ -131,6 +162,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             mazeWorld.updatePlayer(survivor.getX(), survivor.getY());//set the player at a new start position
             maze = mazeWorld.generateMaze();
 
+            updateLevel();//increase the game level by 1
             startTime = SystemClock.uptimeMillis();//reset the start time
 
             inChange = false;//free the player
@@ -147,6 +179,10 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    /**Function to draw the maze
+     *
+     * @param gl
+     */
     private void drawMaze(GL10 gl) {//draw maze function
 
         for(int r = 0; r < row; r++) {
@@ -173,6 +209,17 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         dirButtons.rightButton.draw(gl, rightButtonTexture);
         dirButtons.upButton.draw(gl, upButtonTexture);
         dirButtons.downButton.draw(gl, downButtonTexture);
+    }
+
+    /**Function to draw the ScoreBoard
+     *
+     * @param gl
+     */
+    private void drawScoreBoard(GL10 gl) {
+
+        scoreBoard.lvSymbol.draw(gl, lvSymbolTexture);
+        scoreBoard.firstDigit.draw(gl, numTextures[gameLevel / 10]);
+        scoreBoard.secondDigit.draw(gl, numTextures[gameLevel % 10]);
     }
 
     /**Update the survivor position according to the touch event
@@ -273,6 +320,14 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         }
 
         return textureHandle[0];
+    }
+
+    /**Function to update game level
+     *
+     */
+    private void updateLevel() {
+
+        gameLevel += 1;
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
