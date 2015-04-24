@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import javax.microedition.khronos.opengles.GL10;
+
 /**
  * Created by Malvin on 4/23/2015.
  * Game World contains MazeCells
@@ -117,6 +119,27 @@ public class MazeWorld {
             for(int c = 0; c < col; c++) {
                 if(maze[r][c].Type == 'p' || maze[r][c].Type == 'e') {
                     maze[r][c].Type = 'w';
+                }
+            }
+        }
+    }
+
+    /**Function to draw the maze
+     *
+     * @param gl
+     */
+    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int exitTexture) {//draw maze function
+
+        for(int r = 0; r < row; r++) {
+            for(int c = 0; c < col; c++) {
+                if(maze[r][c].Type == 'w') {//draw the wall cell
+                    maze[r][c].mazeCell.draw(gl, wallTexture);
+                } else if(maze[r][c].Type == 'p') {//draw the path cell
+                    maze[r][c].mazeCell.draw(gl, pathTexture);
+                } else if(maze[r][c].Type == 's') {//draw the survivor
+                    maze[r][c].mazeCell.draw(gl, survivorTexture);
+                } else if(maze[r][c].Type == 'e') {//draw the exit
+                    maze[r][c].mazeCell.draw(gl, exitTexture);
                 }
             }
         }

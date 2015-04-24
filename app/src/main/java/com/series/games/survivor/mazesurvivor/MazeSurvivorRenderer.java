@@ -1,18 +1,14 @@
 package com.series.games.survivor.mazesurvivor;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.os.SystemClock;
 
-import com.series.games.survivor.mazesurvivor.gameobjects.Dir;
 import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
+import com.series.games.survivor.mazesurvivor.gameobjects.GameTextures;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
 import com.series.games.survivor.mazesurvivor.gameobjects.ScoreBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.Survivor;
-import com.series.survivor.survivorgames.R;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -54,18 +50,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //record the game levels
     private int gameLevel;
 
-    //texture Ids used for drawing maze
-    private int wallTexture;
-    private int pathTexture;
-    private int survivorTexture;
-    private int exitTexture;
-    private int leftButtonTexture;
-    private int rightButtonTexture;
-    private int upButtonTexture;
-    private int downButtonTexture;
-    private int lvSymbolTexture;
-    private int numTextures[];
-
+    //All the textures used for game rendering
+    private GameTextures gameTextures;
 
     //Constructor
     public MazeSurvivorRenderer(float ratio, int row, int col, Context context) {
@@ -114,27 +100,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         //load the textures used for drawing maze, load the texture once, and bind it to GL_TEXTURE_2D when render
-        wallTexture = loadTexture(gl, context, R.drawable.brick_wall);
-        pathTexture = loadTexture(gl, context, R.drawable.grass);
-        survivorTexture = loadTexture(gl, context, R.drawable.survivor);
-        exitTexture = loadTexture(gl, context, R.drawable.exit);
-        leftButtonTexture = loadTexture(gl, context, R.drawable.leftbutton);
-        rightButtonTexture = loadTexture(gl, context, R.drawable.rightbutton);
-        upButtonTexture = loadTexture(gl, context, R.drawable.upbutton);
-        downButtonTexture = loadTexture(gl, context, R.drawable.downbutton);
-        lvSymbolTexture = loadTexture(gl, context, R.drawable.lvsymbol);
-        numTextures = new int[]{
-                loadTexture(gl, context, R.drawable.num0),
-                loadTexture(gl, context, R.drawable.num1),
-                loadTexture(gl, context, R.drawable.num2),
-                loadTexture(gl, context, R.drawable.num3),
-                loadTexture(gl, context, R.drawable.num4),
-                loadTexture(gl, context, R.drawable.num5),
-                loadTexture(gl, context, R.drawable.num6),
-                loadTexture(gl, context, R.drawable.num7),
-                loadTexture(gl, context, R.drawable.num8),
-                loadTexture(gl, context, R.drawable.num9)
-        };
+        gameTextures = new GameTextures(gl, context);
     }
 
     public void onDrawFrame(GL10 gl) {
@@ -142,184 +108,29 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
         //draw all the elements on the game interface
-        drawMaze(gl);
-        drawScoreBoard(gl);
-        drawButtons(gl);
+        mazeWorld.drawMaze(gl,
+                gameTextures.wallTexture,
+                gameTextures.pathTexture,
+                gameTextures.survivorTexture,
+                gameTextures.exitTexture
+        );
+        scoreBoard.drawScoreBoard(gl,
+                gameTextures.lvSymbolTexture,
+                gameTextures.numTextures,
+                gameLevel
+        );
+        dirButtons.drawButtons(gl,
+                gameTextures.leftButtonTexture,
+                gameTextures.rightButtonTexture,
+                gameTextures.upButtonTexture,
+                gameTextures.downButtonTexture
+        );
 
         if(findExit) {//player run out of current maze, create a new maze for the player
-            findExit = false;//set the boolean flag to false
-            inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
-
-            //enlarge the maze's size to increase the difficulty of the game
-            row += 2;
-            col += 2;
-
-            //reset the player and re-generate the maze
-            survivor = new Survivor(row, col);
-
-            //re-generate the maze
-            mazeWorld.updateMaze(row, col);//update the row and column of the maze
-            mazeWorld.updatePlayer(survivor.getX(), survivor.getY());//set the player at a new start position
-            maze = mazeWorld.generateMaze();
-
-            updateLevel();//increase the game level by 1
-            startTime = SystemClock.uptimeMillis();//reset the start time
-
-            inChange = false;//free the player
-        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * mazeWorld.getMaxCost() / 5) > 0) {
-
-            //player still in current maze, change the maze around every (maze row) seconds
-            inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
-            startTime = SystemClock.uptimeMillis();
-
-            //update the player's position, avoid changing the maze with the previous player's position
-            mazeWorld.updatePlayer(survivor.getX(), survivor.getY());//set the player at a new start position
-            maze = mazeWorld.changeMaze();//change the maze
-            inChange = false;//free the player
+            updateGame();
+        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * mazeWorld.getMaxCost() / 4) > 0) {
+            changeMaze();
         }
-    }
-
-    /**Function to draw the maze
-     *
-     * @param gl
-     */
-    private void drawMaze(GL10 gl) {//draw maze function
-
-        for(int r = 0; r < row; r++) {
-            for(int c = 0; c < col; c++) {
-                if(maze[r][c].Type == 'w') {//draw the wall cell
-                    maze[r][c].mazeCell.draw(gl, wallTexture);
-                } else if(maze[r][c].Type == 'p') {//draw the path cell
-                    maze[r][c].mazeCell.draw(gl, pathTexture);
-                } else if(maze[r][c].Type == 's') {//draw the survivor
-                    maze[r][c].mazeCell.draw(gl, survivorTexture);
-                } else if(maze[r][c].Type == 'e') {//draw the exit
-                    maze[r][c].mazeCell.draw(gl, exitTexture);
-                }
-            }
-        }
-    }
-
-    /**Function to draw the direction control buttons
-     *
-     * @param gl
-     */
-    private void drawButtons(GL10 gl) {//draw operation buttons
-        dirButtons.leftButton.draw(gl, leftButtonTexture);
-        dirButtons.rightButton.draw(gl, rightButtonTexture);
-        dirButtons.upButton.draw(gl, upButtonTexture);
-        dirButtons.downButton.draw(gl, downButtonTexture);
-    }
-
-    /**Function to draw the ScoreBoard
-     *
-     * @param gl
-     */
-    private void drawScoreBoard(GL10 gl) {
-
-        scoreBoard.lvSymbol.draw(gl, lvSymbolTexture);
-        scoreBoard.firstDigit.draw(gl, numTextures[gameLevel / 10]);
-        scoreBoard.secondDigit.draw(gl, numTextures[gameLevel % 10]);
-    }
-
-    /**Update the survivor position according to the touch event
-     *
-     * @param move
-     */
-    public void updateSurvivor(String move) {
-        switch(move) {
-            case "LEFT":
-                int moveLeft = Dir.LEFT.moveY(survivor.getY());
-                if(!inChange && moveLeft >=0 && maze[survivor.getX()][moveLeft].Type != 'w') {
-                    //maze is not in change, and can move to the new cell
-                    if(maze[survivor.getX()][moveLeft].Type == 'e') {
-                        findExit = true;
-                    }
-                    maze[survivor.getX()][survivor.getY()].Type = 'p';
-                    survivor.updateY(moveLeft);
-                    maze[survivor.getX()][survivor.getY()].Type = 's';
-                }
-                break;
-            case "RIGHT":
-                int moveRight = Dir.RIGHT.moveY(survivor.getY());
-                if(!inChange && moveRight < row && maze[survivor.getX()][moveRight].Type != 'w') {
-                    //maze is not in change, and can move to the new cell
-                    if(maze[survivor.getX()][moveRight].Type == 'e') {
-                        findExit = true;
-                    }
-                    maze[survivor.getX()][survivor.getY()].Type = 'p';
-                    survivor.updateY(moveRight);
-                    maze[survivor.getX()][survivor.getY()].Type = 's';
-                }
-                break;
-            case "UP":
-                int moveUp = Dir.UP.moveX(survivor.getX());
-                if(!inChange && moveUp >= 0 && maze[moveUp][survivor.getY()].Type != 'w') {
-                    //maze is not in change, and can move to the new cell
-                    if(maze[moveUp][survivor.getY()].Type == 'e') {
-                        findExit = true;
-                    }
-                    maze[survivor.getX()][survivor.getY()].Type = 'p';
-                    survivor.updateX(moveUp);
-                    maze[survivor.getX()][survivor.getY()].Type = 's';
-                }
-                break;
-            case "DOWN":
-                int moveDown = Dir.DOWN.moveX(survivor.getX());
-                if(!inChange && moveDown < col && maze[moveDown][survivor.getY()].Type != 'w') {
-                    //maze is not in change, and can move to the new cell
-                    if(maze[moveDown][survivor.getY()].Type == 'e') {
-                        findExit = true;
-                    }
-                    maze[survivor.getX()][survivor.getY()].Type = 'p';
-                    survivor.updateX(moveDown);
-                    maze[survivor.getX()][survivor.getY()].Type = 's';
-                }
-                break;
-        }
-    }
-
-    /**Function to load the textures
-     *
-     * @param gl
-     * @param context
-     * @param resourceId
-     * @return
-     */
-    public static int loadTexture(GL10 gl, final Context context, final int resourceId)
-    {
-        final int[] textureHandle = new int[1];
-
-        gl.glGenTextures(1, textureHandle, 0);
-
-        if (textureHandle[0] != 0 )
-        {
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;   // No pre-scaling
-
-            // Read in the resource
-            final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-
-            // Bind to the texture in OpenGL
-            gl.glBindTexture(GL10.GL_TEXTURE_2D, textureHandle[0]);
-
-            // Set filtering
-            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
-
-            // Load the bitmap into the bound texture.
-            GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-
-            // Recycle the bitmap, since its data has been loaded into OpenGL.
-            bitmap.recycle();
-        }
-
-        if (textureHandle[0] == 0)
-        {
-            throw new RuntimeException("Error loading texture.");
-        }
-
-        return textureHandle[0];
     }
 
     /**Function to update game level
@@ -328,6 +139,62 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     private void updateLevel() {
 
         gameLevel += 1;
+    }
+
+    /**Function to update the player's postion
+     *
+     * @param move
+     */
+    public void updateSurvivor(String move) {
+
+        if(survivor.updateSurvivor(move, maze, inChange)) {//player reach the exit
+            updateFindExit();
+        }
+    }
+    private void updateFindExit() {
+
+        findExit = true;
+    }
+
+    /**Change the game to the next level
+     *
+     */
+    private void updateGame() {
+
+        findExit = false;//set the boolean flag to false
+        inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
+
+        //enlarge the maze's size to increase the difficulty of the game
+        row += 2;
+        col += 2;
+
+        //reset the player and re-generate the maze
+        survivor = new Survivor(row, col);
+
+        //re-generate the maze
+        mazeWorld.updateMaze(row, col);//update the row and column of the maze
+        mazeWorld.updatePlayer(survivor.getX(), survivor.getY());//set the player at a new start position
+        maze = mazeWorld.generateMaze();
+
+        updateLevel();//increase the game level by 1
+        startTime = SystemClock.uptimeMillis();//reset the start time
+
+        inChange = false;//free the player
+    }
+
+    /**Change the maze
+     *
+     */
+    private void changeMaze() {
+
+        //player still in current maze, change the maze around every (maze row) seconds
+        inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
+        startTime = SystemClock.uptimeMillis();
+
+        //update the player's position, avoid changing the maze with the previous player's position
+        mazeWorld.updatePlayer(survivor.getX(), survivor.getY());//set the player at a new start position
+        maze = mazeWorld.changeMaze();//change the maze
+        inChange = false;//free the player
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
