@@ -19,6 +19,7 @@ public class GenerateRandomMaze {
     private int col;//maze's column number
     private int maxNumOfMonster;//Max num of monsters that move in the maze
     private Monster[] monsters;//store all the monsters
+    private int costFromMosterToSurvivor;//distance from monster to survivor
 
     public void generateMaze(MazeWorld.Cell[][] maze, int startX, int startY, int maxNumOfMonster) {//main function to generate the maze
 
@@ -30,8 +31,11 @@ public class GenerateRandomMaze {
         //Initialize the max cost as minimum int
         maxCost = Integer.MIN_VALUE;
 
+        //Initializations for monsters
         this.maxNumOfMonster = maxNumOfMonster;
         monsters = new Monster[maxNumOfMonster];
+        costFromMosterToSurvivor = 20;
+
         generatePath(startX, startY, 0);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
     }
@@ -51,8 +55,9 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                if(localMax > 10 && maxNumOfMonster > 0) {//Can create monster, and the cost to the survivor is larger than 10
-
+                if(localMax > costFromMosterToSurvivor && maxNumOfMonster > 0) {
+                    //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
+                    costFromMosterToSurvivor += 20;//set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
                     //create a monster by using current coordinates
                     monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis(), row, col);

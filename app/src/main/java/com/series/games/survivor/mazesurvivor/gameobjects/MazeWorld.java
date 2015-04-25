@@ -92,7 +92,7 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, startX, startY, 1);
+        mazeGenerator.generateMaze(maze, startX, startY, 8);
         return maze;
     }
 
@@ -160,8 +160,9 @@ public class MazeWorld {
     private void updateMonsters(boolean inChange) {
 
         for(Monster monster : mazeGenerator.getMonsters()) {
-
-            monster.move(maze, SystemClock.uptimeMillis(), inChange);
+            if(monster != null) {//move the monster if it is alive
+                monster.move(maze, SystemClock.uptimeMillis(), inChange);
+            }
         }
     }
 

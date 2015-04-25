@@ -38,17 +38,18 @@ public class Monster {
         int moveUp = Dir.UP.moveX(indexX);
         int moveDown = Dir.DOWN.moveX(indexX);
 
-        if(!inChange && ((int)((systemTime - prevTime) / 1000L) >= 1)){//1 or more second past, and the maze is not in change
+        if(!inChange && systemTime - prevTime >= 500L){//1 or more second past, and the maze is not in change
 
             //Set the prev time to current system time
             prevTime = systemTime;
 
             //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
             if(moveLeft >= 0 && maze[indexX][moveLeft].Type == 'p' &&
-                    (lastPosition == null || lastPosition[1] != moveLeft)) {
+                    (lastPosition == null || lastPosition[0] != indexX || lastPosition[1] != moveLeft)) {
                 if(lastPosition == null) {
                     lastPosition = new int[]{indexX, indexY};
                 } else {
+                    lastPosition[0] = indexX;
                     lastPosition[1] = indexY;
                 }
                 //Move to left
@@ -58,11 +59,12 @@ public class Monster {
                 return;//avoid marching on the spot
             }
             if(moveUp >= 0 && maze[moveUp][indexY].Type == 'p' &&
-                    (lastPosition == null || lastPosition[0] != moveUp)) {
+                    (lastPosition == null || lastPosition[1] != indexY || lastPosition[0] != moveUp)) {
                 if(lastPosition == null) {
                     lastPosition = new int[]{indexX, indexY};
                 } else {
                     lastPosition[0] = indexX;
+                    lastPosition[1] = indexY;
                 }
                 //Move to up side
                 maze[indexX][indexY].Type = 'p';
@@ -71,10 +73,11 @@ public class Monster {
                 return;//avoid marching on the spot
             }
             if(moveRight < row && maze[indexX][moveRight].Type == 'p' &&
-                    (lastPosition == null || lastPosition[1] != moveRight)) {
+                    (lastPosition == null || lastPosition[0] != indexX || lastPosition[1] != moveRight)) {
                 if(lastPosition == null) {
                     lastPosition = new int[]{indexX, indexY};
                 } else {
+                    lastPosition[0] = indexX;
                     lastPosition[1] = indexY;
                 }
                 //Move to right
@@ -84,17 +87,22 @@ public class Monster {
                 return;//avoid marching on the spot
             }
             if(moveDown < col && maze[moveDown][indexY].Type == 'p' &&
-                    (lastPosition == null || lastPosition[0] != moveDown)) {
+                    (lastPosition == null || lastPosition[1] != indexY || lastPosition[0] != moveDown)) {
                 if(lastPosition == null) {
                     lastPosition = new int[]{indexX, indexY};
                 } else {
                     lastPosition[0] = indexX;
+                    lastPosition[1] = indexY;
                 }
                 //Move to down side
                 maze[indexX][indexY].Type = 'p';
                 updateX(moveDown);
                 maze[indexX][indexY].Type = 'm';
                 return;//avoid marching on the spot
+            }
+            //Come into a corner, need to reset the last position parameter to get a direction to go out
+            if(lastPosition != null) {
+                lastPosition = null;
             }
         }
     }

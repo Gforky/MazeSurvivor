@@ -130,7 +130,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         if(findExit) {//player run out of current maze, create a new maze for the player
             updateGame();
-        } else if((SystemClock.uptimeMillis() - startTime) / (1000L * mazeWorld.getMaxCost() / 4) > 0) {
+        } else if((SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 4)) {//time to change the maze
             changeMaze();
         }
     }
