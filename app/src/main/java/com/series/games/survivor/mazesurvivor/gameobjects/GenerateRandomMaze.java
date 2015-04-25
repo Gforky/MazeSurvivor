@@ -47,7 +47,7 @@ public class GenerateRandomMaze {
      * @param localMax
      */
     private void generatePath(int X, int Y, int localMax) {
-        Dir[] dirs = Dir.values();//get the array of four directions
+        Dir[] dirs = Dir.values();
         shuffle(dirs);//shuffle the order of the directions, in order to move to random direction at each level
         for(Dir dir : dirs) {//try every direction, check whether can move to
             //move 2 steps
@@ -55,9 +55,9 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                if(localMax > costFromMosterToSurvivor && maxNumOfMonster > 0) {
+                if(localMax + 2 < maxCost && localMax > costFromMosterToSurvivor && maxNumOfMonster > 0) {
                     //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
-                    costFromMosterToSurvivor += 20;//set the next monster further
+                    costFromMosterToSurvivor += 40;//set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
                     //create a monster by using current coordinates
                     monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis(), row, col);

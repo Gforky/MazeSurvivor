@@ -33,78 +33,61 @@ public class Monster {
      */
     public void move(MazeWorld.Cell[][] maze, long systemTime, boolean inChange) {
 
-        int moveLeft = Dir.LEFT.moveY(indexY);
-        int moveRight = Dir.RIGHT.moveY(indexY);
-        int moveUp = Dir.UP.moveX(indexX);
-        int moveDown = Dir.DOWN.moveX(indexX);
+        //Get a random order array of directions, in order to move to a random direction each time
+        Dir[] dirs = Dir.values();
+        shuffle(dirs);
 
         if(!inChange && systemTime - prevTime >= 500L){//1 or more second past, and the maze is not in change
 
             //Set the prev time to current system time
             prevTime = systemTime;
 
-            //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
-            if(moveLeft >= 0 && maze[indexX][moveLeft].Type == 'p' &&
-                    (lastPosition == null || lastPosition[0] != indexX || lastPosition[1] != moveLeft)) {
-                if(lastPosition == null) {
-                    lastPosition = new int[]{indexX, indexY};
-                } else {
-                    lastPosition[0] = indexX;
-                    lastPosition[1] = indexY;
+            for(Dir dir : dirs) {
+
+                int nextX = dir.moveX(indexX);
+                int nextY = dir.moveY(indexY);
+                //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
+                if(valid(maze, nextX, nextY)) {
+                    return;
                 }
-                //Move to left
-                maze[indexX][indexY].Type = 'p';
-                updateY(moveLeft);
-                maze[indexX][indexY].Type = 'm';
-                return;//avoid marching on the spot
-            }
-            if(moveUp >= 0 && maze[moveUp][indexY].Type == 'p' &&
-                    (lastPosition == null || lastPosition[1] != indexY || lastPosition[0] != moveUp)) {
-                if(lastPosition == null) {
-                    lastPosition = new int[]{indexX, indexY};
-                } else {
-                    lastPosition[0] = indexX;
-                    lastPosition[1] = indexY;
-                }
-                //Move to up side
-                maze[indexX][indexY].Type = 'p';
-                updateX(moveUp);
-                maze[indexX][indexY].Type = 'm';
-                return;//avoid marching on the spot
-            }
-            if(moveRight < row && maze[indexX][moveRight].Type == 'p' &&
-                    (lastPosition == null || lastPosition[0] != indexX || lastPosition[1] != moveRight)) {
-                if(lastPosition == null) {
-                    lastPosition = new int[]{indexX, indexY};
-                } else {
-                    lastPosition[0] = indexX;
-                    lastPosition[1] = indexY;
-                }
-                //Move to right
-                maze[indexX][indexY].Type = 'p';
-                updateY(moveRight);
-                maze[indexX][indexY].Type = 'm';
-                return;//avoid marching on the spot
-            }
-            if(moveDown < col && maze[moveDown][indexY].Type == 'p' &&
-                    (lastPosition == null || lastPosition[1] != indexY || lastPosition[0] != moveDown)) {
-                if(lastPosition == null) {
-                    lastPosition = new int[]{indexX, indexY};
-                } else {
-                    lastPosition[0] = indexX;
-                    lastPosition[1] = indexY;
-                }
-                //Move to down side
-                maze[indexX][indexY].Type = 'p';
-                updateX(moveDown);
-                maze[indexX][indexY].Type = 'm';
-                return;//avoid marching on the spot
             }
             //Come into a corner, need to reset the last position parameter to get a direction to go out
-            if(lastPosition != null) {
+            if (lastPosition != null) {
                 lastPosition = null;
             }
         }
+    }
+
+    //shuffle the direction array to get a random order directions
+    private void shuffle(Dir[] dirs) {
+        for(int index = 0; index < dirs.length; index++) {
+            int random = (int)(Math.random() * index);
+            //swap the current direction with the randomly chose direction
+            Dir temp = dirs[random];
+            dirs[random] = dirs[index];
+            dirs[index] = temp;
+        }
+    }
+
+    //check whether the monster can move to the new cell
+    private boolean valid(MazeWorld.Cell[][] maze, int x, int y) {
+
+        if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type == 'p' &&
+                (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
+            if (lastPosition == null) {
+                lastPosition = new int[]{indexX, indexY};
+            } else {
+                lastPosition[0] = indexX;
+                lastPosition[1] = indexY;
+            }
+            //Move to up side
+            maze[indexX][indexY].Type = 'p';
+            updateX(x);
+            updateY(y);
+            maze[indexX][indexY].Type = 'm';
+            return true;
+        }
+        return false;
     }
 
     public int getX() {
