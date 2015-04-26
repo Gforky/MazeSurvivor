@@ -37,7 +37,7 @@ public class Monster {
         Dir[] dirs = Dir.values();
         shuffle(dirs);
 
-        if(!inChange && systemTime - prevTime >= 500L){//1 or more second past, and the maze is not in change
+        if(!inChange && systemTime - prevTime >= 300L){//1 or more second past, and the maze is not in change
 
             //Set the prev time to current system time
             prevTime = systemTime;

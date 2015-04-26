@@ -92,7 +92,7 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, startX, startY, 8);
+        mazeGenerator.generateMaze(maze, startX, startY, 16);
         return maze;
     }
 

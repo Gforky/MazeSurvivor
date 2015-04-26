@@ -19,7 +19,6 @@ public class GenerateRandomMaze {
     private int col;//maze's column number
     private int maxNumOfMonster;//Max num of monsters that move in the maze
     private Monster[] monsters;//store all the monsters
-    private int costFromMosterToSurvivor;//distance from monster to survivor
 
     public void generateMaze(MazeWorld.Cell[][] maze, int startX, int startY, int maxNumOfMonster) {//main function to generate the maze
 
@@ -34,9 +33,8 @@ public class GenerateRandomMaze {
         //Initializations for monsters
         this.maxNumOfMonster = maxNumOfMonster;
         monsters = new Monster[maxNumOfMonster];
-        costFromMosterToSurvivor = 20;
 
-        generatePath(startX, startY, 0);//generate a maze with the matrix and start point
+        generatePath(startX, startY, 0, 20);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
     }
 
@@ -46,7 +44,7 @@ public class GenerateRandomMaze {
      * @param Y
      * @param localMax
      */
-    private void generatePath(int X, int Y, int localMax) {
+    private void generatePath(int X, int Y, int localMax, int costFromMonsterToSurvivor) {
         Dir[] dirs = Dir.values();
         shuffle(dirs);//shuffle the order of the directions, in order to move to random direction at each level
         for(Dir dir : dirs) {//try every direction, check whether can move to
@@ -55,17 +53,19 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(maze, nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                if(localMax + 2 < maxCost && localMax > costFromMosterToSurvivor && maxNumOfMonster > 0) {
+                //maze[nextX][nextY].Type = 'p';
+                if(localMax < maxCost && localMax > costFromMonsterToSurvivor && maxNumOfMonster > 0) {//check whether can set the cell as a monster
                     //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
-                    costFromMosterToSurvivor += 40;//set the next monster further
+                    //costFromMosterToSurvivor += 40;//set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
                     //create a monster by using current coordinates
                     monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis(), row, col);
+                    //costFromMonsterToSurvivor += 40;//set the next monster further
                     maxNumOfMonster--;//decrease the available number of monsters by 1
                 } else {
                     maze[nextX][nextY].Type = 'p';
                 }
-                generatePath(nextX, nextY, localMax + 2);//continue generate the path from the new cell
+                generatePath(nextX, nextY, localMax + 2, maze[nextX][nextY].Type == 'm' ? costFromMonsterToSurvivor + 40: costFromMonsterToSurvivor);//continue generate the path from the new cell
             } else {//check whether the cell can be set as the exit, and temporarily record the indices of the cell
                 if(localMax > maxCost) {//find a larger cost path to the survivor, set the cell as exit
                     //update the exit indices and global max cost
