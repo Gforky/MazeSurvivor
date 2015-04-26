@@ -172,10 +172,16 @@ public class MazeWorld {
      *
      * @return
      */
-    public boolean gameOver() {
+    public boolean checkIfGameOver() {
 
-        if(mazeGenerator.gameOver()) {
-            return true;
+        for(Monster monster : mazeGenerator.getMonsters()) {
+            if(monster != null) {
+                if(monster.isAlive && monster.getX() == survivor.getX() && monster.getY() == survivor.getY()) {
+                    //Player is killed by the monster
+                    survivor.isAlive = false;
+                    return true;
+                }
+            }
         }
         return false;
     }

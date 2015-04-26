@@ -15,8 +15,6 @@ public class Monster {
     private int[] lastPosition;
     //Survival status of the monster
     public boolean isAlive;
-    //Check whether the monster find the player
-    public boolean findSurvivor;
 
     public Monster(int indexX, int indexY, long createTime, int row, int col) {
 
@@ -25,7 +23,6 @@ public class Monster {
         this.indexY = indexY;
         prevTime = createTime;
         isAlive = true;
-        findSurvivor = false;
     }
 
     /**Function to move the monster, move it to a direction by 1 step every second
@@ -52,10 +49,6 @@ public class Monster {
                 //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
                 if(maze[indexX][indexY].Type == 'a') {//Monster is killed by the player
                     isAlive = false;
-                } else if(survivor.getX() == indexX && survivor.getY() == indexY) {//Monster find and kill the player, game is over
-                    survivor.isAlive = false;
-                    findSurvivor = true;
-                    return;
                 } else if(valid(maze, nextX, nextY)) {
                     return;
                 }

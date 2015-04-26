@@ -96,19 +96,6 @@ public class GenerateRandomMaze {
         return false;
     }
 
-    /**Function to check whether the player is killed by the monster
-     *
-     * @return
-     */
-    public boolean gameOver() {
-        for(Monster monster : monsters) {
-            if(monster != null && monster.findSurvivor) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**Function to check the survival status of monsters
      *
      * @return

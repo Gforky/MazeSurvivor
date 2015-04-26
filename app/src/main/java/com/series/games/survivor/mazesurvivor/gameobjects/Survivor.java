@@ -42,11 +42,6 @@ public class Survivor {
             case "LEFT":
                 int moveLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && moveLeft >= 0 && maze[indexX][moveLeft].Type != 'w') {
-                    //Player is killed by the monster
-                    if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
-                        return false;
-                    }
                     //change the player's orientation to left
                     if(orientation != "LEFT") {
                         orientation = "LEFT";
@@ -67,11 +62,6 @@ public class Survivor {
             case "RIGHT":
                 int moveRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && moveRight < row && maze[indexX][moveRight].Type != 'w') {
-                    //Player is killed by the monster
-                    if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
-                        return false;
-                    }
                     //change the player's orientation to right
                     if(orientation != "RIGHT") {
                         orientation = "RIGHT";
@@ -92,11 +82,6 @@ public class Survivor {
             case "UP":
                 int moveUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && moveUp >= 0 && maze[moveUp][indexY].Type != 'w') {
-                    //Player is killed by the monster
-                    if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
-                        return false;
-                    }
                     //change the player's orientation to up
                     if(orientation != "UP") {
                         orientation = "UP";
@@ -117,11 +102,6 @@ public class Survivor {
             case "DOWN":
                 int moveDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && moveDown < col && maze[moveDown][indexY].Type != 'w') {
-                    //Player is killed by the monster
-                    if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
-                        return false;
-                    }
                     //change the player's orientation to down
                     if(orientation != "DOWN") {
                         orientation = "DOWN";

@@ -111,9 +111,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
         //Check the game status
-        if(mazeWorld.gameOver()) {//Player is killed by the monster
-            mazeWorld.survivor.isAlive = false;
-        }
+        mazeWorld.checkIfGameOver();//Player is killed by the monster
+
 
         //Check the survival status of monsters
         mazeWorld.checkMonsterIsAlive();
