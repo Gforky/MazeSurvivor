@@ -27,10 +27,6 @@ public class MazeWorld {
     private int col;
     private float ratio;
 
-    //Parameters needed to create the maze
-    private int startX;
-    private int startY;
-
     //four control buttons
     private DirButtons dirButtons;
 
@@ -38,17 +34,15 @@ public class MazeWorld {
     private GenerateRandomMaze mazeGenerator;
 
     //Game player
-    private Survivor survivor;
+    public Survivor survivor;
 
-    public MazeWorld(int row, int col, float ratio, Survivor survivor) {
+    public MazeWorld(int row, int col, float ratio) {
 
         //Initialize the maze cells
-        this.survivor = survivor;
+        this.survivor = new Survivor(row, col);;
         this.row = row;
         this.col = col;
         this.ratio = ratio;
-        this.startX = survivor.getX();
-        this.startY = survivor.getY();
 
         //Initialize the maze generator
         mazeGenerator = new GenerateRandomMaze();
@@ -78,7 +72,7 @@ public class MazeWorld {
         for(int r = 0; r < row; r++) {
             for(int c = 0; c < col; c++) {
                 //initialize the corresponding cells
-                if(r == startX && c == startY) {//initially only set the start point as available path
+                if(r == survivor.getX() && c == survivor.getY()) {//initially only set the start point as available path
                     maze[r][c] = new Cell('s', null);//p as "path"
                 } else {//set all the other cells as walls
                     maze[r][c] = new Cell('w', null);//w as "wall"
@@ -96,7 +90,7 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, startX, startY, 16);
+        mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16);
         return maze;
     }
 
@@ -109,8 +103,8 @@ public class MazeWorld {
 
     public void updatePlayer(int newX, int newY) {
 
-        startX = newX;
-        startY = newY;
+        survivor.updateX(newX);
+        survivor.updateY(newY);
     }
 
     public void updateMaze(int newRow, int newCol) {
@@ -191,9 +185,9 @@ public class MazeWorld {
      *
      * @return
      */
-    public void checkIfAlive() {
+    public void checkMonsterIsAlive() {
 
-        mazeGenerator.checkIfAlive();
+        mazeGenerator.checkMonsterIsAlive();
     }
 
     public Cell[][] getMaze() {

@@ -29,9 +29,9 @@ public class Sword {
         maze[indexX][indexY].Type = 'p';
     }
 
-    private void inActive(long startTime) {//Sword in active for 0.5 seconds
+    private void inActive(long startTime) {//Sword in active for 0.2 seconds
         long endTime = startTime;
-        while(endTime - startTime < 100L) {
+        while(endTime - startTime < 200L) {
             endTime = SystemClock.uptimeMillis();
         }
     }

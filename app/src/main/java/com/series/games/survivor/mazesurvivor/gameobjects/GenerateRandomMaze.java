@@ -113,7 +113,7 @@ public class GenerateRandomMaze {
      *
      * @return
      */
-    public void checkIfAlive() {
+    public void checkMonsterIsAlive() {
 
         for(Monster monster : monsters) {
             if(monster != null) {

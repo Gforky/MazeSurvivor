@@ -25,8 +25,8 @@ public class Survivor {
         this.indexY = (int) (Math.random() * (col - 1));
         //Create the sword
         sword = new Sword(indexX, indexY);
-        //Initially set the player's orientation as noting
-        orientation = "";
+        //Initially set the player's orientation as self
+        orientation = "SELF";
     }
 
     /**Update the survivor position according to the touch event
@@ -37,20 +37,26 @@ public class Survivor {
         int row = maze.length;
         int col = maze[0].length;
         boolean findExit = false;
-        //Update the orientation
-        orientation = move;
         switch(move) {
 
             case "LEFT":
                 int moveLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && moveLeft >= 0 && maze[indexX][moveLeft].Type != 'w') {
+                    //Player is killed by the monster
+                    if(maze[indexX][indexY].Type == 'm') {
+                        isAlive = false;
+                        return false;
+                    }
+                    //change the player's orientation to left
+                    if(orientation != "LEFT") {
+                        orientation = "LEFT";
+                        return false;
+                    }
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateY(moveLeft);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
-                    } else if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
                     } else {
                         maze[indexX][indexY].Type = 's';
                     }
@@ -61,13 +67,21 @@ public class Survivor {
             case "RIGHT":
                 int moveRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && moveRight < row && maze[indexX][moveRight].Type != 'w') {
+                    //Player is killed by the monster
+                    if(maze[indexX][indexY].Type == 'm') {
+                        isAlive = false;
+                        return false;
+                    }
+                    //change the player's orientation to right
+                    if(orientation != "RIGHT") {
+                        orientation = "RIGHT";
+                        return false;
+                    }
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateY(moveRight);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
-                    } else if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
                     } else {
                         maze[indexX][indexY].Type = 's';
                     }
@@ -78,13 +92,21 @@ public class Survivor {
             case "UP":
                 int moveUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && moveUp >= 0 && maze[moveUp][indexY].Type != 'w') {
+                    //Player is killed by the monster
+                    if(maze[indexX][indexY].Type == 'm') {
+                        isAlive = false;
+                        return false;
+                    }
+                    //change the player's orientation to up
+                    if(orientation != "UP") {
+                        orientation = "UP";
+                        return false;
+                    }
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateX(moveUp);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
-                    } else if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
                     } else {
                         maze[indexX][indexY].Type = 's';
                     }
@@ -95,13 +117,21 @@ public class Survivor {
             case "DOWN":
                 int moveDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && moveDown < col && maze[moveDown][indexY].Type != 'w') {
+                    //Player is killed by the monster
+                    if(maze[indexX][indexY].Type == 'm') {
+                        isAlive = false;
+                        return false;
+                    }
+                    //change the player's orientation to down
+                    if(orientation != "DOWN") {
+                        orientation = "DOWN";
+                        return false;
+                    }
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = 'p';
                     updateX(moveDown);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
-                    } else if(maze[indexX][indexY].Type == 'm') {
-                        isAlive = false;
                     } else {
                         maze[indexX][indexY].Type = 's';
                     }
@@ -125,6 +155,9 @@ public class Survivor {
                 if(isAlive && !inChange && attackLeft >= 0 && (maze[indexX][attackLeft].Type == 'p' || maze[indexX][attackLeft].Type == 'm')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(indexX, attackLeft, maze);
+                    //withdraw the sword
+                    sword.updateX(indexX);
+                    sword.updateY(indexY);
                 }
                 break;
             case "RIGHT":
@@ -132,6 +165,9 @@ public class Survivor {
                 if(isAlive && !inChange && attackRight < row && (maze[indexX][attackRight].Type == 'p' || maze[indexX][attackRight].Type == 'm')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(indexX, attackRight, maze);
+                    //withdraw the sword
+                    sword.updateX(indexX);
+                    sword.updateY(indexY);
                 }
                 break;
             case "UP":
@@ -139,6 +175,9 @@ public class Survivor {
                 if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'e')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(attackUp, indexY, maze);
+                    //withdraw the sword
+                    sword.updateX(indexX);
+                    sword.updateY(indexY);
                 }
                 break;
             case "DOWN":
@@ -146,6 +185,9 @@ public class Survivor {
                 if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'e')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(attackDown, indexY, maze);
+                    //withdraw the sword
+                    sword.updateX(indexX);
+                    sword.updateY(indexY);
                 }
                 break;
         }
