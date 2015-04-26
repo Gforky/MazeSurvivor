@@ -96,6 +96,32 @@ public class GenerateRandomMaze {
         return false;
     }
 
+    /**Function to check whether the player is killed by the monster
+     *
+     * @return
+     */
+    public boolean gameOver() {
+        for(Monster monster : monsters) {
+            if(monster != null && monster.findSurvivor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**Function to check the survival status of monsters
+     *
+     * @return
+     */
+    public void checkIfAlive() {
+
+        for(Monster monster : monsters) {
+            if(monster != null) {
+                monster.checkIfAlive(maze);
+            }
+        }
+    }
+
     //get the cost from exit to the survivor
     public int getMaxCost() {
 

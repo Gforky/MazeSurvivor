@@ -25,6 +25,7 @@ public class MazeSurvivorActivity extends Activity {
     private float buttonRightBorder;
     private float buttonUpBorder;
     private float buttonMidBorder;
+    private float attackButtonleftBorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class MazeSurvivorActivity extends Activity {
         buttonRightBorder = screenWidth * 2 / 3;
         buttonUpBorder = (screenHeight + screenWidth) / 2;
         buttonMidBorder = (screenHeight + screenWidth) / 2 + (screenHeight - screenWidth) / 4;
+        attackButtonleftBorder = screenWidth * 3 / 4;
 
         //Create an instance of GLSurfaceView
         //and set it as the content view
@@ -84,7 +86,9 @@ public class MazeSurvivorActivity extends Activity {
         float x = event.getX();
         float y = event.getY();
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN://According to the touch down position, move survivor to the corresponding direction, by 1 step
+            case MotionEvent.ACTION_DOWN://According to the touch down position
+                //move survivor to the corresponding direction, by 1 step
+                //Or attack the monster
                 if(x < buttonLeftBorder && y > buttonUpBorder) {
                     myGLView.myRenderer.updateSurvivor("LEFT");
                 } else if(x > buttonRightBorder && y > buttonUpBorder) {
@@ -93,6 +97,8 @@ public class MazeSurvivorActivity extends Activity {
                     myGLView.myRenderer.updateSurvivor("UP");
                 } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
+                } else if(x > attackButtonleftBorder && y > screenWidth && y < buttonUpBorder) {
+                    myGLView.myRenderer.updateSword();
                 }
             case MotionEvent.ACTION_MOVE:
 

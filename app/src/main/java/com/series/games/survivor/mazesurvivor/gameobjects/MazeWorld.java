@@ -37,14 +37,18 @@ public class MazeWorld {
     //Maze generator to create the random mazes
     private GenerateRandomMaze mazeGenerator;
 
-    public MazeWorld(int row, int col, float ratio, int startX, int startY) {
+    //Game player
+    private Survivor survivor;
+
+    public MazeWorld(int row, int col, float ratio, Survivor survivor) {
 
         //Initialize the maze cells
+        this.survivor = survivor;
         this.row = row;
         this.col = col;
         this.ratio = ratio;
-        this.startX = startX;
-        this.startY = startY;
+        this.startX = survivor.getX();
+        this.startY = survivor.getY();
 
         //Initialize the maze generator
         mazeGenerator = new GenerateRandomMaze();
@@ -131,9 +135,11 @@ public class MazeWorld {
      * @param gl
      */
     public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture,
-                         int exitTexture, int monsterTexture, boolean inChange) {
-        //Update the monsters' positions
-        updateMonsters(inChange);
+                         int exitTexture, int monsterTexture, int swordTexture, boolean inChange, boolean survivorIsAlive) {
+        //Update the monsters' positions, if game is still continuing
+        if(survivorIsAlive) {
+            updateMonsters(inChange);
+        }
 
         //draw maze function
         for(int r = 0; r < row; r++) {
@@ -148,6 +154,8 @@ public class MazeWorld {
                     maze[r][c].mazeCell.draw(gl, exitTexture);
                 } else if(maze[r][c].Type == 'm') {//draw monsters
                     maze[r][c].mazeCell.draw(gl, monsterTexture);
+                } else if(maze[r][c].Type == 'a') {//draw the sword in attack
+                    maze[r][c].mazeCell.draw(gl, swordTexture);
                 }
             }
         }
@@ -160,10 +168,32 @@ public class MazeWorld {
     private void updateMonsters(boolean inChange) {
 
         for(Monster monster : mazeGenerator.getMonsters()) {
-            if(monster != null) {//move the monster if it is alive
-                monster.move(maze, SystemClock.uptimeMillis(), inChange);
+            if(monster != null && monster.isAlive) {//move the monster if it is alive
+                monster.move(maze, SystemClock.uptimeMillis(), inChange, survivor);
             }
         }
+    }
+
+    /**Function to check whether the player is killed by the monster
+     *
+     * @return
+     */
+    public boolean gameOver() {
+
+        if(mazeGenerator.gameOver()) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**Function to check the survival status of monsters
+     *
+     * @return
+     */
+    public void checkIfAlive() {
+
+        mazeGenerator.checkIfAlive();
     }
 
     public Cell[][] getMaze() {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.SystemClock;
 
+import com.series.games.survivor.mazesurvivor.gameobjects.AttackButton;
 import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
 import com.series.games.survivor.mazesurvivor.gameobjects.GameTextures;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
@@ -38,6 +39,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //ScoreBoard
     private ScoreBoard scoreBoard;
 
+    //Attack Button
+    private AttackButton attackButton;
+
     //record the status of the player, if the player find the exit, set it to true
     private boolean findExit;
 
@@ -69,7 +73,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gameLevel = (row - 2) / 2;
 
         //Initialize the maze
-        mazeWorld = new MazeWorld(row, col, ratio, survivor.getX(), survivor.getY());
+        mazeWorld = new MazeWorld(row, col, ratio, survivor);
 
         //Get the maze from generator
         maze = mazeWorld.generateMaze();//generate a M * N maze
@@ -79,6 +83,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         //Initialize ScoreBoard
         scoreBoard = new ScoreBoard(ratio);
+
+        //Initialize AttackButton
+        attackButton = new AttackButton(ratio);
 
         //set the game start time for current round
         startTime = SystemClock.uptimeMillis();
@@ -107,6 +114,14 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         //Redraw background color
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
+        //Check the game status
+        if(mazeWorld.gameOver()) {//Player is killed by the monster
+            survivor.isAlive = false;
+        }
+
+        //Check the survival status of monsters
+        mazeWorld.checkIfAlive();
+
         //draw all the elements on the game interface
         mazeWorld.drawMaze(gl,
                 gameTextures.wallTexture,
@@ -114,7 +129,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.survivorTexture,
                 gameTextures.exitTexture,
                 gameTextures.monsterTexture,
-                inChange
+                gameTextures.attackTexture,
+                inChange,
+                survivor.isAlive
         );
         scoreBoard.drawScoreBoard(gl,
                 gameTextures.lvSymbolTexture,
@@ -127,12 +144,14 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.upButtonTexture,
                 gameTextures.downButtonTexture
         );
+        attackButton.drawAttackButton(gl, gameTextures.attackTexture);
 
-        if(findExit) {//player run out of current maze, create a new maze for the player
+        if(survivor.isAlive && findExit) {//player run out of current maze, create a new maze for the player
             updateGame();
-        } else if((SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 4)) {//time to change the maze
+        } /*else if(survivor.isAlive && (SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 4)) {
+            //time to change the maze
             changeMaze();
-        }
+        }*/
     }
 
     /**Function to update game level
@@ -143,19 +162,26 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         gameLevel += 1;
     }
 
-    /**Function to update the player's postion
+    /**Function to update the player's position
      *
      * @param move
      */
     public void updateSurvivor(String move) {
 
-        if(survivor.updateSurvivor(move, maze, inChange)) {//player reach the exit
+        if(survivor.isAlive && survivor.updateSurvivor(move, maze, inChange)) {//player reach the exit
             updateFindExit();
         }
     }
     private void updateFindExit() {
 
         findExit = true;
+    }
+
+    /**Function to use the sword to attack the monster
+     *
+     */
+    public void updateSword() {
+        survivor.attack(maze, inChange);
     }
 
     /**Change the game to the next level

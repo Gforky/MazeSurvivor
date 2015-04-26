@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import android.os.SystemClock;
+
 /**
  * Created by Luke on 4/25/2015.
  * Sword used by the player
@@ -8,12 +10,10 @@ public class Sword {
 
     private int indexX;
     private int indexY;
-    private boolean outForAttack;//Status of the sword
 
     public Sword(int indexX, int indexY) {
         this.indexX = indexX;
         this.indexY = indexY;
-        outForAttack = false;
     }
 
     /**Function to use the sword to attack
@@ -21,27 +21,38 @@ public class Sword {
      * @param newX
      * @param newY
      */
-    public void attackIt(int newX, int newY) {
-        outForAttack = true;
-        indexX = newX;
-        indexY = newY;
-        inActive();
+    public void attackMonster(int newX, int newY, MazeWorld.Cell[][] maze) {
+        updateX(newX);
+        updateY(newY);
+        maze[indexX][indexY].Type = 'a';
+        inActive(SystemClock.uptimeMillis());
+        maze[indexX][indexY].Type = 'p';
+    }
 
+    private void inActive(long startTime) {//Sword in active for 0.5 seconds
+        long endTime = startTime;
+        while(endTime - startTime < 100L) {
+            endTime = SystemClock.uptimeMillis();
+        }
     }
 
     public int getX() {
+
         return indexX;
     }
 
     public int getY() {
+
         return indexY;
     }
 
-    private void updateX(int newX) {
+    public void updateX(int newX) {
+
         indexX = newX;
     }
 
-    private void updateY(int newY) {
+    public void updateY(int newY) {
+
         indexY = newY;
     }
 }

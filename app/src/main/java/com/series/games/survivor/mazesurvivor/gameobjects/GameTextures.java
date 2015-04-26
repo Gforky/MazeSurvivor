@@ -27,6 +27,7 @@ public class GameTextures {
     public int lvSymbolTexture;
     public int numTextures[];
     public int monsterTexture;
+    public int attackTexture;
 
     public GameTextures(GL10 gl, Context context) {
 
@@ -53,6 +54,7 @@ public class GameTextures {
                 loadTexture(gl, context, R.drawable.num9)
         };
         monsterTexture = loadTexture(gl, context, R.drawable.monster);
+        attackTexture = loadTexture(gl, context, R.drawable.attack);
     }
 
     /**Function to load the textures
