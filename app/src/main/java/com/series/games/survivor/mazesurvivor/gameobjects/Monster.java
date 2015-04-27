@@ -78,7 +78,7 @@ public class Monster {
     private boolean valid(MazeWorld.Cell[][] maze, int x, int y, Survivor survivor) {
 
         if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type != 'w' && maze[x][y].Type != 'e' &&
-                (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
+                maze[x][y].Type != 't' && (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
             if (lastPosition == null) {
                 lastPosition = new int[]{indexX, indexY};
             } else {

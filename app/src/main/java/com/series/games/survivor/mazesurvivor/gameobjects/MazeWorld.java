@@ -33,6 +33,7 @@ public class MazeWorld {
     //Maze generator to create the random mazes
     private GenerateRandomMaze mazeGenerator;
     private Monster[] monsters;
+    private Trap[] traps;
 
     //Game player
     public Survivor survivor;
@@ -91,8 +92,9 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16);
+        mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16, 16);
         monsters = mazeGenerator.getMonsters();
+        traps = mazeGenerator.getTraps();
         return maze;
     }
 
@@ -130,12 +132,14 @@ public class MazeWorld {
      *
      * @param gl
      */
-    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture,
+    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int activeTrapTexture,
                          int exitTexture, int monsterTexture, int swordTexture, boolean inChange, boolean survivorIsAlive) {
         //Update the monsters' positions, if game is still continuing
         if(survivorIsAlive) {
             updateMonsters(inChange);
         }
+        //update the traps' status
+        updateTraps();
 
         //draw maze function
         for(int r = 0; r < row; r++) {
@@ -152,6 +156,12 @@ public class MazeWorld {
                     maze[r][c].mazeCell.draw(gl, monsterTexture);
                 } else if(maze[r][c].Type == 'a') {//draw the sword in attack
                     maze[r][c].mazeCell.draw(gl, swordTexture);
+                } else if(maze[r][c].Type == 't') {//draw the trap
+                    if(mazeGenerator.getTrap(r, c).getActiveStatus()) {//Trap is active
+                        maze[r][c].mazeCell.draw(gl, activeTrapTexture);
+                    } else {//Trap is not active
+                        maze[r][c].mazeCell.draw(gl, pathTexture);
+                    }
                 }
             }
         }
@@ -171,6 +181,18 @@ public class MazeWorld {
         }
     }
 
+    /**Function to check the traps' status
+     *
+     */
+    private void updateTraps() {
+
+        for(Trap trap : traps) {
+            if(trap != null) {
+                trap.updateTrap(SystemClock.uptimeMillis());
+            }
+        }
+    }
+
     /**Function to check whether the player is killed by the monster
      *
      * @return
@@ -178,12 +200,16 @@ public class MazeWorld {
     public boolean checkIfGameOver() {
 
         for(Monster monster : mazeGenerator.getMonsters()) {
-            if(monster != null) {
-                if(monster.isAlive && monster.getX() == survivor.getX() && monster.getY() == survivor.getY()) {
-                    //Player is killed by the monster
-                    survivor.isAlive = false;
-                    return true;
-                }
+            if(monster != null && monster.isAlive && monster.getX() == survivor.getX() && monster.getY() == survivor.getY()) {
+            //Player is killed by the monster
+                survivor.isAlive = false;
+                return true;
+            }
+        }
+        for(Trap trap : traps) {
+            if(trap != null && trap.getActiveStatus() && trap.getX() == survivor.getX() && trap.getY() == survivor.getY()) {
+                survivor.isAlive = false;
+                return true;
             }
         }
         return false;

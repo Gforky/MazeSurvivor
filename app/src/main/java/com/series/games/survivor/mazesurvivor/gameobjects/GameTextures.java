@@ -28,6 +28,7 @@ public class GameTextures {
     public int numTextures[];
     public int monsterTexture;
     public int attackTexture;
+    public int activeTrapTexture;
 
     public GameTextures(GL10 gl, Context context) {
 
@@ -55,6 +56,7 @@ public class GameTextures {
         };
         monsterTexture = loadTexture(gl, context, R.drawable.monster);
         attackTexture = loadTexture(gl, context, R.drawable.attack);
+        activeTrapTexture = loadTexture(gl, context, R.drawable.trap);
     }
 
     /**Function to load the textures

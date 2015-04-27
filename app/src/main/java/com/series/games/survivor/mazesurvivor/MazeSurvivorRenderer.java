@@ -128,6 +128,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.wallTexture,
                 gameTextures.pathTexture,
                 gameTextures.survivorTexture,
+                gameTextures.activeTrapTexture,
                 gameTextures.exitTexture,
                 gameTextures.monsterTexture,
                 gameTextures.attackTexture,
