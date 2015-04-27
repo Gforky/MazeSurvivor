@@ -33,11 +33,12 @@ public class Monster {
      */
     public void move(MazeWorld.Cell[][] maze, long systemTime, boolean inChange, Survivor survivor) {
 
+        checkIfAlive(survivor.sword);
         //Get a random order array of directions, in order to move to a random direction each time
         Dir[] dirs = Dir.values();
         shuffle(dirs);
 
-        if(isAlive && !inChange && systemTime - prevTime >= 500L){//1 or more second past, and the maze is not in change
+        if(isAlive && !inChange && systemTime - prevTime >= 500L){//0.5 or more second past, and the maze is not in change
 
             //Set the prev time to current system time
             prevTime = systemTime;
@@ -49,7 +50,7 @@ public class Monster {
                 //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
                 if(maze[indexX][indexY].Type == 'a') {//Monster is killed by the player
                     isAlive = false;
-                } else if(valid(maze, nextX, nextY)) {
+                } else if(valid(maze, nextX, nextY, survivor)) {
                     return;
                 }
                 if(!isAlive) {
@@ -76,7 +77,7 @@ public class Monster {
     }
 
     //check whether the monster can move to the new cell
-    private boolean valid(MazeWorld.Cell[][] maze, int x, int y) {
+    private boolean valid(MazeWorld.Cell[][] maze, int x, int y, Survivor survivor) {
 
         if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type != 'w' && maze[x][y].Type != 'e' &&
                 (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
@@ -86,25 +87,29 @@ public class Monster {
                 lastPosition[0] = indexX;
                 lastPosition[1] = indexY;
             }
-            //Move to the new cell,
+            //Move to the new cell
             maze[indexX][indexY].Type = 'p';
             updateX(x);
             updateY(y);
-            maze[indexX][indexY].Type = 'm';
-            return true;
+            //check whether the monster is killed
+            if(checkIfAlive(survivor.sword)) {
+                maze[indexX][indexY].Type = 'm';
+                return true;
+            }
         }
         return false;
     }
 
     /**Function to check the survival status of the monster
      *
-     * @param maze
      */
-    public void checkIfAlive(MazeWorld.Cell[][] maze) {
+    public boolean checkIfAlive(Sword sword) {
 
-        if(maze[indexX][indexY].Type == 'a') {
+        if(isAlive && sword.outForAttack && indexX == sword.getX() && indexY == sword.getY()) {
             isAlive = false;
+            return false;
         }
+        return true;
     }
 
     public int getX() {

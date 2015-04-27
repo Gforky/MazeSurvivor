@@ -96,19 +96,6 @@ public class GenerateRandomMaze {
         return false;
     }
 
-    /**Function to check the survival status of monsters
-     *
-     * @return
-     */
-    public void checkMonsterIsAlive() {
-
-        for(Monster monster : monsters) {
-            if(monster != null) {
-                monster.checkIfAlive(maze);
-            }
-        }
-    }
-
     //get the cost from exit to the survivor
     public int getMaxCost() {
 

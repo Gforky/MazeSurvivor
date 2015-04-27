@@ -10,7 +10,7 @@ public class Survivor {
     private int indexX;
     private int indexY;
     //Survivor got a sword for attacking
-    private Sword sword;
+    public Sword sword;
     //Record the player's orientation
     private String orientation;
     //Survive status of the player;
@@ -25,8 +25,8 @@ public class Survivor {
         this.indexY = (int) (Math.random() * (col - 1));
         //Create the sword
         sword = new Sword(indexX, indexY);
-        //Initially set the player's orientation as self
-        orientation = "SELF";
+        //Initially set the player's orientation as DOWN
+        orientation = "DOWN";
     }
 
     /**Update the survivor position according to the touch event
@@ -124,7 +124,7 @@ public class Survivor {
         return findExit;
     }
 
-    public void attack(MazeWorld.Cell[][] maze, boolean inChange) {
+    public void attack(MazeWorld.Cell[][] maze, boolean inChange, Monster[] monsters) {
         int row = maze.length;
         int col = maze[0].length;
 
@@ -134,7 +134,7 @@ public class Survivor {
                 int attackLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && attackLeft >= 0 && (maze[indexX][attackLeft].Type == 'p' || maze[indexX][attackLeft].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(indexX, attackLeft, maze);
+                    sword.attackMonster(indexX, attackLeft, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -144,7 +144,7 @@ public class Survivor {
                 int attackRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && attackRight < row && (maze[indexX][attackRight].Type == 'p' || maze[indexX][attackRight].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(indexX, attackRight, maze);
+                    sword.attackMonster(indexX, attackRight, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -154,7 +154,7 @@ public class Survivor {
                 int attackUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'e')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(attackUp, indexY, maze);
+                    sword.attackMonster(attackUp, indexY, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -164,7 +164,7 @@ public class Survivor {
                 int attackDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'e')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(attackDown, indexY, maze);
+                    sword.attackMonster(attackDown, indexY, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);

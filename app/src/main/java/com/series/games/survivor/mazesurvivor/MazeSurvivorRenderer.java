@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.os.SystemClock;
 
 import com.series.games.survivor.mazesurvivor.gameobjects.AttackButton;
+import com.series.games.survivor.mazesurvivor.gameobjects.CountDownTimer;
 import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
 import com.series.games.survivor.mazesurvivor.gameobjects.GameTextures;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
@@ -35,6 +36,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
     //ScoreBoard
     private ScoreBoard scoreBoard;
+
+    //Count Down Timer
+    private CountDownTimer countDownTimer;
 
     //Attack Button
     private AttackButton attackButton;
@@ -80,6 +84,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         //Initialize ScoreBoard
         scoreBoard = new ScoreBoard(ratio);
 
+        //Initialize CountDownTimer
+        countDownTimer = new CountDownTimer(ratio);
+
         //Initialize AttackButton
         attackButton = new AttackButton(ratio);
 
@@ -113,7 +120,6 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         //Check the game status
         mazeWorld.checkIfGameOver();//Player is killed by the monster
 
-
         //Check the survival status of monsters
         mazeWorld.checkMonsterIsAlive();
 
@@ -128,24 +134,30 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 inChange,
                 mazeWorld.survivor.isAlive
         );
+
         scoreBoard.drawScoreBoard(gl,
                 gameTextures.lvSymbolTexture,
                 gameTextures.numTextures,
                 gameLevel
         );
+
         dirButtons.drawButtons(gl,
                 gameTextures.leftButtonTexture,
                 gameTextures.rightButtonTexture,
                 gameTextures.upButtonTexture,
                 gameTextures.downButtonTexture
         );
+
         attackButton.drawAttackButton(gl, gameTextures.attackTexture);
+
+        countDownTimer.drawCountDownTime(gl, gameTextures.numTextures, mazeWorld.survivor.isAlive,
+                ((1000L * mazeWorld.getMaxCost() / 2) - (SystemClock.uptimeMillis() - startTime)) / 1000L);
 
         //player run out of current maze, create a new maze for the player
         if(mazeWorld.survivor.isAlive && findExit) {
             updateGame();
         } else if(mazeWorld.survivor.isAlive &&
-                (SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 4)) {
+                (SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 2)) {
             //time to change the maze
             changeMaze();
         }
@@ -180,7 +192,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
      */
     public void updateSword() {
 
-        mazeWorld.survivor.attack(maze, inChange);
+        mazeWorld.survivor.attack(maze, inChange, mazeWorld.getMonsters());
     }
 
     /**Change the game to the next level

@@ -32,6 +32,7 @@ public class MazeWorld {
 
     //Maze generator to create the random mazes
     private GenerateRandomMaze mazeGenerator;
+    private Monster[] monsters;
 
     //Game player
     public Survivor survivor;
@@ -91,6 +92,7 @@ public class MazeWorld {
         }
 
         mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16);
+        monsters = mazeGenerator.getMonsters();
         return maze;
     }
 
@@ -161,6 +163,7 @@ public class MazeWorld {
      */
     private void updateMonsters(boolean inChange) {
 
+        checkMonsterIsAlive();
         for(Monster monster : mazeGenerator.getMonsters()) {
             if(monster != null && monster.isAlive) {//move the monster if it is alive
                 monster.move(maze, SystemClock.uptimeMillis(), inChange, survivor);
@@ -193,7 +196,11 @@ public class MazeWorld {
      */
     public void checkMonsterIsAlive() {
 
-        mazeGenerator.checkMonsterIsAlive();
+        for(Monster monster : monsters) {
+            if(monster != null) {
+                monster.checkIfAlive(survivor.sword);
+            }
+        }
     }
 
     public Cell[][] getMaze() {
@@ -209,5 +216,10 @@ public class MazeWorld {
     public int getMaxCost() {
 
         return mazeGenerator.getMaxCost();
+    }
+
+    public Monster[] getMonsters() {
+
+        return monsters;
     }
 }
