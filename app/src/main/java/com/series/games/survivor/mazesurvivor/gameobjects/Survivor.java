@@ -152,7 +152,7 @@ public class Survivor {
                 break;
             case "UP":
                 int attackUp = Dir.UP.moveX(indexX);
-                if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'e')) {
+                if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(attackUp, indexY, maze, monsters);
                     //withdraw the sword
@@ -162,7 +162,7 @@ public class Survivor {
                 break;
             case "DOWN":
                 int attackDown = Dir.DOWN.moveX(indexX);
-                if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'e')) {
+                if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
                     sword.attackMonster(attackDown, indexY, maze, monsters);
                     //withdraw the sword

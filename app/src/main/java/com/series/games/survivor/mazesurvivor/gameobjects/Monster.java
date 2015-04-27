@@ -16,7 +16,7 @@ public class Monster {
     //Survival status of the monster
     public boolean isAlive;
 
-    public Monster(int indexX, int indexY, long createTime, int row, int col) {
+    public Monster(int indexX, int indexY, long createTime) {
 
         //Initializations
         this.indexX = indexX;
@@ -50,11 +50,9 @@ public class Monster {
                 //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
                 if(maze[indexX][indexY].Type == 'a') {//Monster is killed by the player
                     isAlive = false;
-                } else if(valid(maze, nextX, nextY, survivor)) {
-                    return;
-                }
-                if(!isAlive) {
                     maze[indexX][indexY].Type = 'p';
+                    return;
+                } else if(valid(maze, nextX, nextY, survivor)) {
                     return;
                 }
             }

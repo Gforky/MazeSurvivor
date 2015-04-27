@@ -59,7 +59,7 @@ public class GenerateRandomMaze {
                     //costFromMosterToSurvivor += 40;//set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
                     //create a monster by using current coordinates
-                    monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis(), row, col);
+                    monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis());
                     //costFromMonsterToSurvivor += 40;//set the next monster further
                     maxNumOfMonster--;//decrease the available number of monsters by 1
                 } else {
