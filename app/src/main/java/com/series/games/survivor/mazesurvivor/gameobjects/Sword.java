@@ -23,29 +23,36 @@ public class Sword {
      * @param newX
      * @param newY
      */
-    public void attackMonster(int newX, int newY, MazeWorld.Cell[][] maze, Monster[] monsters) {
+    public int attackMonster(int newX, int newY, MazeWorld.Cell[][] maze, Monster[] monsters) {
+        //Return the number of monsters be kill in this time's attack
+        int beKilledMonsters = 0;
         if(!outForAttack) {//Sword is not out for attack
             outForAttack = true;
             updateX(newX);
             updateY(newY);
             maze[indexX][indexY].Type = 'a';
-            inActive(SystemClock.uptimeMillis(), monsters);
+            beKilledMonsters = inActive(SystemClock.uptimeMillis(), monsters);
             maze[indexX][indexY].Type = 'p';
             outForAttack = false;
+            return beKilledMonsters;
         }
+        return beKilledMonsters;
     }
 
-    private void inActive(long startTime, Monster[] monsters) {//Sword in active for 0.1 seconds
+    private int inActive(long startTime, Monster[] monsters) {//Sword in active for 0.1 seconds, return the number of monsters be killed
         long endTime = startTime;
+        int beKilledMonsters = 0;
         while(endTime - startTime < 100L) {
             for(Monster monster : monsters) {
-                if(monster != null && outForAttack && indexX == monster.getX() && indexY == monster.getY()) {
+                if(monster != null && monster.isAlive && outForAttack && indexX == monster.getX() && indexY == monster.getY()) {
                     //Monster is killed by the player
                     monster.isAlive = false;
+                    beKilledMonsters += 1;
                 }
             }
             endTime = SystemClock.uptimeMillis();
         }
+        return beKilledMonsters;
     }
 
     public int getX() {

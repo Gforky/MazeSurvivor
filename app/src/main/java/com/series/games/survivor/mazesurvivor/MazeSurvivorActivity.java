@@ -25,7 +25,9 @@ public class MazeSurvivorActivity extends Activity {
     private float buttonRightBorder;
     private float buttonUpBorder;
     private float buttonMidBorder;
-    private float attackButtonleftBorder;
+    private float attackButtonLeftBorder;
+    private float bonusTimeLeftBorder;
+    private float bonusTimeBottomBorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,6 @@ public class MazeSurvivorActivity extends Activity {
                 size += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
             }
         }
-        System.out.println("Size is " + size);
 
         //get the screen's width and height ratio
         WindowManager manager = (WindowManager)this.getSystemService(Context.WINDOW_SERVICE);
@@ -59,7 +60,9 @@ public class MazeSurvivorActivity extends Activity {
         buttonRightBorder = screenWidth * 2 / 3;
         buttonUpBorder = (screenHeight + screenWidth) / 2;
         buttonMidBorder = (screenHeight + screenWidth) / 2 + (screenHeight - screenWidth) / 4;
-        attackButtonleftBorder = screenWidth * 3 / 4;
+        attackButtonLeftBorder = screenWidth * 3 / 4;
+        bonusTimeLeftBorder = screenWidth / 2;
+        bonusTimeBottomBorder = screenWidth + (screenHeight - screenWidth) / 4;
 
         //Create an instance of GLSurfaceView
         //and set it as the content view
@@ -98,8 +101,10 @@ public class MazeSurvivorActivity extends Activity {
                     myGLView.myRenderer.updateSurvivor("UP");
                 } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
-                } else if(x > attackButtonleftBorder && y > screenWidth && y < buttonUpBorder) {
+                } else if(x > attackButtonLeftBorder && y > screenWidth && y < buttonUpBorder) {
                     myGLView.myRenderer.updateSword();
+                } else if(x > bonusTimeLeftBorder && x < attackButtonLeftBorder && y > screenWidth && y < bonusTimeBottomBorder) {
+                    myGLView.myRenderer.mazeWorld.updateChangeTime();
                 }
             case MotionEvent.ACTION_MOVE:
 

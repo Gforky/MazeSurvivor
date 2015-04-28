@@ -17,6 +17,8 @@ public class Survivor {
     public boolean isAlive;
     //Record the previous type of player's current cell
     private char prevType;
+    //Record the number of bonus time delayers that player have
+    private int numOfTimeDelayer;
 
     public Survivor(int row, int col) {
 
@@ -31,6 +33,8 @@ public class Survivor {
         orientation = "DOWN";
         //Initially se the lastType as path
         prevType = 'p';
+        //Initially have 0 time delayer
+        numOfTimeDelayer = 0;
     }
 
     /**Update the survivor position according to the touch event
@@ -58,6 +62,10 @@ public class Survivor {
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
                     } else {
+                        if(maze[indexX][indexY].Type == 'b') {//get a time delayer
+                            numOfTimeDelayer = numOfTimeDelayer < 3 ? numOfTimeDelayer + 1 : numOfTimeDelayer;
+                            prevType = 'p';
+                        }
                         maze[indexX][indexY].Type = 's';
                     }
                     //Also update the position of the sword
@@ -79,6 +87,10 @@ public class Survivor {
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
                     } else {
+                        if(maze[indexX][indexY].Type == 'b') {//get a time delayer
+                            numOfTimeDelayer = numOfTimeDelayer < 3 ? numOfTimeDelayer + 1 : numOfTimeDelayer;
+                            prevType = 'p';
+                        }
                         maze[indexX][indexY].Type = 's';
                     }
                     //Also update the position of the sword
@@ -100,6 +112,10 @@ public class Survivor {
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
                     } else {
+                        if(maze[indexX][indexY].Type == 'b') {//get a time delayer
+                            numOfTimeDelayer = numOfTimeDelayer < 3 ? numOfTimeDelayer + 1 : numOfTimeDelayer;
+                            prevType = 'p';
+                        }
                         maze[indexX][indexY].Type = 's';
                     }
                     //Also update the position of the sword
@@ -121,6 +137,10 @@ public class Survivor {
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
                     } else {
+                        if(maze[indexX][indexY].Type == 'b') {//get a time delayer
+                            numOfTimeDelayer = numOfTimeDelayer < 3 ? numOfTimeDelayer + 1 : numOfTimeDelayer;
+                            prevType = 'p';
+                        }
                         maze[indexX][indexY].Type = 's';
                     }
                     //Also update the position of the sword
@@ -132,9 +152,11 @@ public class Survivor {
         return findExit;
     }
 
-    public void attack(MazeWorld.Cell[][] maze, boolean inChange, Monster[] monsters) {
+    public int attack(MazeWorld.Cell[][] maze, boolean inChange, Monster[] monsters) {
+        //Return the number of monsters be killed in this time's attack
         int row = maze.length;
         int col = maze[0].length;
+        int beKilledMonsters = 0;
 
         switch(orientation) {
 
@@ -142,7 +164,7 @@ public class Survivor {
                 int attackLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && attackLeft >= 0 && (maze[indexX][attackLeft].Type == 'p' || maze[indexX][attackLeft].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(indexX, attackLeft, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(indexX, attackLeft, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -152,7 +174,7 @@ public class Survivor {
                 int attackRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && attackRight < row && (maze[indexX][attackRight].Type == 'p' || maze[indexX][attackRight].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(indexX, attackRight, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(indexX, attackRight, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -162,7 +184,7 @@ public class Survivor {
                 int attackUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(attackUp, indexY, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(attackUp, indexY, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -172,13 +194,14 @@ public class Survivor {
                 int attackDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
-                    sword.attackMonster(attackDown, indexY, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(attackDown, indexY, maze, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
                 }
                 break;
         }
+        return beKilledMonsters;
     }
 
     public int getX() {
@@ -189,6 +212,16 @@ public class Survivor {
     public int getY() {
 
         return indexY;
+    }
+
+    public int getNumOfTimeDelayer() {
+
+        return numOfTimeDelayer;
+    }
+
+    public void decreaseNumOfTimeDelayer() {
+
+        numOfTimeDelayer = numOfTimeDelayer > 0 ? numOfTimeDelayer - 1 : 0;
     }
 
     public void updateX(int newX) {

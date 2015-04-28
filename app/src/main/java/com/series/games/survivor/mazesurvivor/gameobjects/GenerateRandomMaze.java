@@ -51,7 +51,7 @@ public class GenerateRandomMaze {
 
         maxNumOfBonusTime = 3;
         bonusTimes = new BonusTime[maxNumOfBonusTime];
-        costFromBonusTimeToSurvivor = 60;
+        costFromBonusTimeToSurvivor = 40;
 
         generatePath(startX, startY, 0);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
@@ -73,7 +73,14 @@ public class GenerateRandomMaze {
             int nextY = dir.moveY(dir.moveY(Y));
             if(valid(nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
-                if(localMax < maxCost && localMax > costFromMonsterToSurvivor && maxNumOfMonster > 0
+                if(localMax < maxCost && localMax > costFromBonusTimeToSurvivor && maxNumOfBonusTime > 0
+                        && canPutMonsterOrTrap(nextX, nextY)) {
+
+                    maze[nextX][nextY].Type = 'b';
+                    costFromBonusTimeToSurvivor += 100;
+                    bonusTimes[maxNumOfBonusTime - 1] = new BonusTime(nextX, nextY);
+                    maxNumOfBonusTime--;
+                } else if(localMax < maxCost && localMax > costFromMonsterToSurvivor && maxNumOfMonster > 0
                         && canPutMonsterOrTrap(nextX, nextY)) {//check whether can set the cell as a monster
                     //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
                     //if set current cell as a monster, increase costFromMonsterToSurvivor by 40, set the next monster further
@@ -89,13 +96,6 @@ public class GenerateRandomMaze {
                     costFromTrapToSurvivor += 20;
                     traps[maxNumOfTrap - 1] = new Trap(nextX, nextY, SystemClock.uptimeMillis());
                     maxNumOfTrap--;
-                } else if(localMax < maxCost && localMax > costFromBonusTimeToSurvivor && maxNumOfBonusTime > 0
-                        && canPutMonsterOrTrap(nextX, nextY)) {
-
-                    maze[nextX][nextY].Type = 'b';
-                    costFromBonusTimeToSurvivor += 60;
-                    bonusTimes[maxNumOfBonusTime - 1] = new BonusTime(nextX, nextY);
-                    maxNumOfBonusTime--;
                 } else {
                     maze[nextX][nextY].Type = 'p';
                 }

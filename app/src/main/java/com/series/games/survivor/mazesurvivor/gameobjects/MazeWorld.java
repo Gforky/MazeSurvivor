@@ -33,7 +33,12 @@ public class MazeWorld {
     //Maze generator to create the random mazes
     private GenerateRandomMaze mazeGenerator;
     private Monster[] monsters;
+    //Record the number of monsters be killed, if exceed 100, only display 99
+    private int numOfKilledMonsters;
     private Trap[] traps;
+
+    //Time to change the maze without bonus time
+    private long changeTime;
 
     //Game player
     public Survivor survivor;
@@ -48,6 +53,8 @@ public class MazeWorld {
 
         //Initialize the maze generator
         mazeGenerator = new GenerateRandomMaze();
+
+        numOfKilledMonsters = 0;
 
         //Initialize the direction buttons
         dirButtons = new DirButtons(ratio);
@@ -95,6 +102,7 @@ public class MazeWorld {
         mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16, 16);
         monsters = mazeGenerator.getMonsters();
         traps = mazeGenerator.getTraps();
+        changeTime = 1000L * getMaxCost() / 3;
         return maze;
     }
 
@@ -179,9 +187,22 @@ public class MazeWorld {
         checkMonsterIsAlive();
         for(Monster monster : mazeGenerator.getMonsters()) {
             if(monster != null && monster.isAlive) {//move the monster if it is alive
-                monster.move(maze, SystemClock.uptimeMillis(), inChange, survivor);
+                if(!monster.move(maze, SystemClock.uptimeMillis(), inChange, survivor)) {
+                    numOfKilledMonsters = numOfKilledMonsters < 99 ? numOfKilledMonsters + 1 : numOfKilledMonsters;
+                }
             }
         }
+    }
+
+    /**Function to call the Survivor's attack function
+     *
+     * @param inChange
+     */
+    public void survivorAttack(boolean inChange) {
+
+        int beKilledMonsters = survivor.attack(maze, inChange, monsters);
+        int totalNum = numOfKilledMonsters + beKilledMonsters < 99 ? numOfKilledMonsters + beKilledMonsters : 99;
+        numOfKilledMonsters = numOfKilledMonsters < 99 ? totalNum : numOfKilledMonsters;
     }
 
     /**Function to check the traps' status
@@ -193,6 +214,14 @@ public class MazeWorld {
             if(trap != null) {
                 trap.updateTrap(SystemClock.uptimeMillis());
             }
+        }
+    }
+
+    public void updateChangeTime() {
+
+        if(survivor.getNumOfTimeDelayer() > 0) {
+            changeTime += 5000L;
+            survivor.decreaseNumOfTimeDelayer();
         }
     }
 
@@ -227,7 +256,9 @@ public class MazeWorld {
 
         for(Monster monster : monsters) {
             if(monster != null) {
-                monster.checkIfAlive(survivor.sword);
+                if(!monster.checkIfAlive(survivor.sword)) {
+                    numOfKilledMonsters = numOfKilledMonsters < 99 ? numOfKilledMonsters + 1 : numOfKilledMonsters;
+                }
             }
         }
     }
@@ -250,5 +281,15 @@ public class MazeWorld {
     public Monster[] getMonsters() {
 
         return monsters;
+    }
+
+    public long getChangeTime() {
+
+        return changeTime;
+    }
+
+    public int getNumOfKilledMonsters() {
+
+        return numOfKilledMonsters;
     }
 }

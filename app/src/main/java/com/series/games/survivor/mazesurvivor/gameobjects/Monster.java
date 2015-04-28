@@ -34,8 +34,8 @@ public class Monster {
      *
      * @param maze
      */
-    public void move(MazeWorld.Cell[][] maze, long systemTime, boolean inChange, Survivor survivor) {
-
+    public boolean move(MazeWorld.Cell[][] maze, long systemTime, boolean inChange, Survivor survivor) {
+        //return value is to the survival status of the monster
         checkIfAlive(survivor.sword);
         //Get a random order array of directions, in order to move to a random direction each time
         Dir[] dirs = Dir.values();
@@ -47,22 +47,26 @@ public class Monster {
             prevTime = systemTime;
 
             for(Dir dir : dirs) {
-
                 int nextX = dir.moveX(indexX);
                 int nextY = dir.moveY(indexY);
                 //Try to move the monster to a direction by 1 step, AVOID moving back to the position where it from
                 if(maze[indexX][indexY].Type == 'a') {//Monster is killed by the player
                     isAlive = false;
                     maze[indexX][indexY].Type = 'p';
-                    return;
+                    return false;
                 } else if(valid(maze, nextX, nextY, survivor)) {
-                    return;
+                    return isAlive;
                 }
             }
             //Come into a corner, need to reset the last position parameter to get a direction to go out
             if (lastPosition != null) {
                 lastPosition = null;
             }
+        }
+        if(isAlive) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -97,8 +101,8 @@ public class Monster {
             //check whether the monster is killed
             if(checkIfAlive(survivor.sword)) {
                 maze[indexX][indexY].Type = 'm';
-                return true;
             }
+            return true;//no matter be killed or not, moved to the new cell
         }
         return false;
     }
