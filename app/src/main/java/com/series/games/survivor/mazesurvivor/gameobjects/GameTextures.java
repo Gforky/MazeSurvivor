@@ -29,6 +29,7 @@ public class GameTextures {
     public int monsterTexture;
     public int attackTexture;
     public int activeTrapTexture;
+    public int bonusTimeTexture;
 
     public GameTextures(GL10 gl, Context context) {
 
@@ -57,6 +58,7 @@ public class GameTextures {
         monsterTexture = loadTexture(gl, context, R.drawable.monster);
         attackTexture = loadTexture(gl, context, R.drawable.attack);
         activeTrapTexture = loadTexture(gl, context, R.drawable.trap);
+        bonusTimeTexture = loadTexture(gl, context, R.drawable.bonustime);
     }
 
     /**Function to load the textures

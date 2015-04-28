@@ -15,6 +15,8 @@ public class Monster {
     private int[] lastPosition;
     //Survival status of the monster
     public boolean isAlive;
+    //Record the previous type of monster's current cell
+    private char prevType;
 
     public Monster(int indexX, int indexY, long createTime) {
 
@@ -23,6 +25,7 @@ public class Monster {
         this.indexY = indexY;
         prevTime = createTime;
         isAlive = true;
+        prevType = 'p';
     }
 
     /**Function to move the monster, move it to a direction by 1 step every second
@@ -86,7 +89,9 @@ public class Monster {
                 lastPosition[1] = indexY;
             }
             //Move to the new cell
-            maze[indexX][indexY].Type = 'p';
+            maze[indexX][indexY].Type = prevType;
+            //Avoid creating duplicate monsters and survivors
+            prevType = maze[x][y].Type == 'm' || maze[x][y].Type == 's' ? 'p' : maze[x][y].Type;
             updateX(x);
             updateY(y);
             //check whether the monster is killed

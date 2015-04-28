@@ -16,7 +16,7 @@ public class Survivor {
     //Survive status of the player;
     public boolean isAlive;
     //Record the previous type of player's current cell
-    private char lastType;
+    private char prevType;
 
     public Survivor(int row, int col) {
 
@@ -30,7 +30,7 @@ public class Survivor {
         //Initially set the player's orientation as DOWN
         orientation = "DOWN";
         //Initially se the lastType as path
-        lastType = 'p';
+        prevType = 'p';
     }
 
     /**Update the survivor position according to the touch event
@@ -52,8 +52,8 @@ public class Survivor {
                         return false;
                     }
                     //maze is not in change, and can move to the new cell
-                    maze[indexX][indexY].Type = lastType;
-                    lastType = maze[indexX][moveLeft].Type;
+                    maze[indexX][indexY].Type = prevType;
+                    prevType = maze[indexX][moveLeft].Type;
                     updateY(moveLeft);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
@@ -73,8 +73,8 @@ public class Survivor {
                         return false;
                     }
                     //maze is not in change, and can move to the new cell
-                    maze[indexX][indexY].Type = lastType;
-                    lastType = maze[indexX][moveRight].Type;
+                    maze[indexX][indexY].Type = prevType;
+                    prevType = maze[indexX][moveRight].Type;
                     updateY(moveRight);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
@@ -94,8 +94,8 @@ public class Survivor {
                         return false;
                     }
                     //maze is not in change, and can move to the new cell
-                    maze[indexX][indexY].Type = lastType;
-                    lastType = maze[moveUp][indexY].Type;
+                    maze[indexX][indexY].Type = prevType;
+                    prevType = maze[moveUp][indexY].Type;
                     updateX(moveUp);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;
@@ -115,8 +115,8 @@ public class Survivor {
                         return false;
                     }
                     //maze is not in change, and can move to the new cell
-                    maze[indexX][indexY].Type = lastType;
-                    lastType = maze[moveDown][indexY].Type;
+                    maze[indexX][indexY].Type = prevType;
+                    prevType = maze[moveDown][indexY].Type;
                     updateX(moveDown);
                     if(maze[indexX][indexY].Type == 'e') {
                         findExit = true;

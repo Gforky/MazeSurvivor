@@ -133,7 +133,8 @@ public class MazeWorld {
      * @param gl
      */
     public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int activeTrapTexture,
-                         int exitTexture, int monsterTexture, int swordTexture, boolean inChange, boolean survivorIsAlive) {
+                         int bonusTimeTexture, int exitTexture, int monsterTexture, int swordTexture,
+                         boolean inChange, boolean survivorIsAlive) {
         //Update the monsters' positions, if game is still continuing
         if(survivorIsAlive) {
             updateMonsters(inChange);
@@ -162,6 +163,8 @@ public class MazeWorld {
                     } else {//Trap is not active
                         maze[r][c].mazeCell.draw(gl, pathTexture);
                     }
+                } else if(maze[r][c].Type == 'b') {//draw the bonus time
+                    maze[r][c].mazeCell.draw(gl, bonusTimeTexture);
                 }
             }
         }

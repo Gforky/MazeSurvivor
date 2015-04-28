@@ -41,9 +41,10 @@ public class MazeSurvivorActivity extends Activity {
             size = 4;
         } else {//get the initial size from menu activity
             for (int index = 0; index < array.length; index++) {
-                size += ((array[index] - '0') * Math.pow(10, array.length - 1));
+                size += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
             }
         }
+        System.out.println("Size is " + size);
 
         //get the screen's width and height ratio
         WindowManager manager = (WindowManager)this.getSystemService(Context.WINDOW_SERVICE);

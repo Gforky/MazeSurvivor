@@ -24,6 +24,10 @@ public class GenerateRandomMaze {
     //Valid cost from trap and monster to the survivor
     private int costFromMonsterToSurvivor;
     private int costFromTrapToSurvivor;
+    //BonusTime delayers
+    private BonusTime[] bonusTimes;
+    private int maxNumOfBonusTime;
+    private int costFromBonusTimeToSurvivor;
 
     public void generateMaze(MazeWorld.Cell[][] maze, int startX, int startY, int maxNumOfMonster, int maxNumOfTrap) {//main function to generate the maze
 
@@ -44,6 +48,10 @@ public class GenerateRandomMaze {
         //Initializations for traps
         this.maxNumOfTrap = maxNumOfTrap;
         traps = new Trap[maxNumOfTrap];
+
+        maxNumOfBonusTime = 3;
+        bonusTimes = new BonusTime[maxNumOfBonusTime];
+        costFromBonusTimeToSurvivor = 60;
 
         generatePath(startX, startY, 0);//generate a maze with the matrix and start point
         maze[exitCell[0]][exitCell[1]].Type = 'e';//set the exit with the largest cost to survivor
@@ -66,7 +74,7 @@ public class GenerateRandomMaze {
             if(valid(nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
                 if(localMax < maxCost && localMax > costFromMonsterToSurvivor && maxNumOfMonster > 0
-                        && canPutMonsterOrTrap(nextX, nextY, 'm')) {//check whether can set the cell as a monster
+                        && canPutMonsterOrTrap(nextX, nextY)) {//check whether can set the cell as a monster
                     //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
                     //if set current cell as a monster, increase costFromMonsterToSurvivor by 40, set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
@@ -75,12 +83,19 @@ public class GenerateRandomMaze {
                     monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis());
                     maxNumOfMonster--;//decrease the available number of monsters by 1
                 } else if(localMax < maxCost && localMax > costFromTrapToSurvivor && maxNumOfTrap > 0
-                        && canPutMonsterOrTrap(nextX, nextY, 't')) {//check if current cell can set as trap
+                        && canPutMonsterOrTrap(nextX, nextY)) {//check if current cell can set as trap
 
                     maze[nextX][nextY].Type = 't';
                     costFromTrapToSurvivor += 20;
                     traps[maxNumOfTrap - 1] = new Trap(nextX, nextY, SystemClock.uptimeMillis());
                     maxNumOfTrap--;
+                } else if(localMax < maxCost && localMax > costFromBonusTimeToSurvivor && maxNumOfBonusTime > 0
+                        && canPutMonsterOrTrap(nextX, nextY)) {
+
+                    maze[nextX][nextY].Type = 'b';
+                    costFromBonusTimeToSurvivor += 60;
+                    bonusTimes[maxNumOfBonusTime - 1] = new BonusTime(nextX, nextY);
+                    maxNumOfBonusTime--;
                 } else {
                     maze[nextX][nextY].Type = 'p';
                 }
@@ -124,10 +139,9 @@ public class GenerateRandomMaze {
      *
      * @param x
      * @param y
-     * @param item
      * @return
      */
-    private boolean canPutMonsterOrTrap(int x, int y, char item) {
+    private boolean canPutMonsterOrTrap(int x, int y) {
 
         int leftBorder = y - 5 < 0 ? 0 : y - 5;
         int rightBorder = y + 5 >= col ? col - 1 : y + 5;
@@ -135,7 +149,8 @@ public class GenerateRandomMaze {
         int downBorder = x + 5 >= row ? row - 1 : x + 5;
         for(int r = upBorder; r <= downBorder; r++) {
             for(int c = leftBorder; c <= rightBorder; c++) {
-                if(maze[r][c].Type == item) {//within 11*11 area, already has the monster / trap, can't put a new one ar current position
+                if(maze[r][c].Type == 'm' || maze[r][c].Type == 't' || maze[r][c].Type == 'b') {
+                //within 11*11 area, already has the monster / trap, can't put a new one ar current position
                     return false;
                 }
             }

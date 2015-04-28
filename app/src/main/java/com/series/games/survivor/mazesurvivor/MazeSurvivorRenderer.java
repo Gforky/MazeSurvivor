@@ -129,6 +129,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.pathTexture,
                 gameTextures.survivorTexture,
                 gameTextures.activeTrapTexture,
+                gameTextures.bonusTimeTexture,
                 gameTextures.exitTexture,
                 gameTextures.monsterTexture,
                 gameTextures.attackTexture,
@@ -158,7 +159,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         if(mazeWorld.survivor.isAlive && findExit) {
             updateGame();
         } else if(mazeWorld.survivor.isAlive &&
-                (SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 2)) {
+                (SystemClock.uptimeMillis() - startTime) >= (1000L * mazeWorld.getMaxCost() / 3)) {
             //time to change the maze
             changeMaze();
         }
