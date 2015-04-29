@@ -9,22 +9,20 @@ import android.opengl.GLSurfaceView;
 public class MazeSurvivorView extends GLSurfaceView {
 
     public final MazeSurvivorRenderer myRenderer;
-    //maze's row and column
-    private int row;
-    private int col;
+    //game's level
+    private int level;
 
     //screen width and height ratio
     private float ratio;
 
-    public MazeSurvivorView(Context context, int row, int col, float ratio) {
+    public MazeSurvivorView(Context context, int level, float ratio) {
         super(context);
 
-        this.row = row;
-        this.col = col;
+        this.level = level;
 
         this.ratio = ratio;
 
-        myRenderer = new MazeSurvivorRenderer(ratio, row, col, context);
+        myRenderer = new MazeSurvivorRenderer(ratio, level, context);
 
         //set myRenderer as the renderer for the GLSurfaceView
         setRenderer(myRenderer);

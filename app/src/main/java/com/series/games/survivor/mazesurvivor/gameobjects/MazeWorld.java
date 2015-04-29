@@ -60,7 +60,7 @@ public class MazeWorld {
         dirButtons = new DirButtons(ratio);
     }
 
-    public Cell[][] generateMaze() {
+    public Cell[][] generateMaze(int maxNumOfMonsters, int maxNumOfTraps) {
 
         maze = new Cell[row][col];//store the cells in maze
 
@@ -99,17 +99,17 @@ public class MazeWorld {
             leftMost = temp;//reset column to the first column
         }
 
-        mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), 16, 16);
+        mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), maxNumOfMonsters, maxNumOfTraps);
         monsters = mazeGenerator.getMonsters();
         traps = mazeGenerator.getTraps();
-        changeTime = 1000L * getMaxCost() / 3;
+        changeTime = 1000L * getMaxCost() / 4;
         return maze;
     }
 
-    public Cell[][] changeMaze() {
+    public Cell[][] changeMaze(int maxNumOfMonsters, int maxNumOfTraps) {
 
         resetMaze();
-        generateMaze();
+        generateMaze(maxNumOfMonsters, maxNumOfTraps);
         return maze;
     }
 
@@ -129,7 +129,7 @@ public class MazeWorld {
 
         for(int r = 0; r < row; r++) {
             for(int c = 0; c < col; c++) {
-                if(maze[r][c].Type == 'p' || maze[r][c].Type == 'e') {
+                if(maze[r][c].Type != 's') {
                     maze[r][c].Type = 'w';
                 }
             }
@@ -142,10 +142,10 @@ public class MazeWorld {
      */
     public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int activeTrapTexture,
                          int bonusTimeTexture, int exitTexture, int monsterTexture, int swordTexture,
-                         boolean inChange, boolean survivorIsAlive) {
+                         boolean inChange, boolean isPaused) {
         //Update the monsters' positions, if game is still continuing
-        if(survivorIsAlive) {
-            updateMonsters(inChange);
+        if(survivor.isAlive && !inChange && !isPaused) {
+            updateMonsters();
         }
         //update the traps' status
         updateTraps();
@@ -180,14 +180,13 @@ public class MazeWorld {
 
     /**Update the monsters' positions
      *
-     * @param inChange
      */
-    private void updateMonsters(boolean inChange) {
+    private void updateMonsters() {
 
         checkMonsterIsAlive();
         for(Monster monster : mazeGenerator.getMonsters()) {
             if(monster != null && monster.isAlive) {//move the monster if it is alive
-                if(!monster.move(maze, SystemClock.uptimeMillis(), inChange, survivor)) {
+                if(!monster.move(maze, SystemClock.uptimeMillis(), survivor)) {
                     numOfKilledMonsters = numOfKilledMonsters < 99 ? numOfKilledMonsters + 1 : numOfKilledMonsters;
                 }
             }
@@ -217,6 +216,9 @@ public class MazeWorld {
         }
     }
 
+    /**Update the maze change time when bonus time is used
+     *
+     */
     public void updateChangeTime() {
 
         if(survivor.getNumOfTimeDelayer() > 0) {

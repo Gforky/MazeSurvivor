@@ -51,10 +51,8 @@ public class Survivor {
                 int moveLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && moveLeft >= 0 && maze[indexX][moveLeft].Type != 'w') {
                     //change the player's orientation to left
-                    if(orientation != "LEFT") {
-                        orientation = "LEFT";
-                        return false;
-                    }
+                    orientation = "LEFT";
+
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = prevType;
                     prevType = maze[indexX][moveLeft].Type;
@@ -76,10 +74,8 @@ public class Survivor {
                 int moveRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && moveRight < row && maze[indexX][moveRight].Type != 'w') {
                     //change the player's orientation to right
-                    if(orientation != "RIGHT") {
-                        orientation = "RIGHT";
-                        return false;
-                    }
+                    orientation = "RIGHT";
+
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = prevType;
                     prevType = maze[indexX][moveRight].Type;
@@ -101,10 +97,8 @@ public class Survivor {
                 int moveUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && moveUp >= 0 && maze[moveUp][indexY].Type != 'w') {
                     //change the player's orientation to up
-                    if(orientation != "UP") {
-                        orientation = "UP";
-                        return false;
-                    }
+                    orientation = "UP";
+
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = prevType;
                     prevType = maze[moveUp][indexY].Type;
@@ -126,10 +120,8 @@ public class Survivor {
                 int moveDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && moveDown < col && maze[moveDown][indexY].Type != 'w') {
                     //change the player's orientation to down
-                    if(orientation != "DOWN") {
-                        orientation = "DOWN";
-                        return false;
-                    }
+                    orientation = "DOWN";
+
                     //maze is not in change, and can move to the new cell
                     maze[indexX][indexY].Type = prevType;
                     prevType = maze[moveDown][indexY].Type;
@@ -212,6 +204,11 @@ public class Survivor {
     public int getY() {
 
         return indexY;
+    }
+
+    public char getPrevType() {
+
+        return  prevType;
     }
 
     public int getNumOfTimeDelayer() {

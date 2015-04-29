@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">SurvivorGames</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="size_of_maze">Set the Size of Maze</string>
+    <string name="level_of_game">Enter 1 - 99</string>
+    <string name="maze_marathon">MazeMarathon</string>
     <string name="jump_to_maze_survivor">MazeSurvivor</string>
     <string name="title_activity_maze_survivor">MazeSurvivorActivity</string>
     <string name="title_activity_survivor_games_menu">SurvivorGamesMenu</string>

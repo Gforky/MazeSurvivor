@@ -37,20 +37,17 @@ public class MazeSurvivorActivity extends Activity {
         Intent intent = getIntent();
         String message = intent.getStringExtra(SurvivorGamesMenu.EXTRA_MESSAGE);
         //convert string to int
-        int size = 0;
+        int level = 0;
         char[] array = message.toCharArray();
-        if(array == null || array.length == 0) {//if no initial size has been set, set it to 4
-            size = 4;
-        } else {//get the initial size from menu activity
-            for (int index = 0; index < array.length; index++) {
-                size += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
-            }
+        //get the initial level from menu activity
+        for (int index = 0; index < array.length; index++) {
+            level += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
         }
 
         //get the screen's width and height ratio
-        WindowManager manager = (WindowManager)this.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager manager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
-        Point point= new Point();
+        Point point = new Point();
         display.getSize(point);
         screenWidth = point.x;
         screenHeight = point.y;
@@ -66,7 +63,7 @@ public class MazeSurvivorActivity extends Activity {
 
         //Create an instance of GLSurfaceView
         //and set it as the content view
-        myGLView = new MazeSurvivorView(this, size, size, ratio);
+        myGLView = new MazeSurvivorView(this, level, ratio);
         setContentView(myGLView);
     }
 
@@ -101,10 +98,12 @@ public class MazeSurvivorActivity extends Activity {
                     myGLView.myRenderer.updateSurvivor("UP");
                 } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
                     myGLView.myRenderer.updateSurvivor("DOWN");
-                } else if(x > attackButtonLeftBorder && y > screenWidth && y < buttonUpBorder) {
+                } else if(x > attackButtonLeftBorder && y > screenWidth && y < buttonUpBorder) {//Attack Button touched
                     myGLView.myRenderer.updateSword();
-                } else if(x > bonusTimeLeftBorder && x < attackButtonLeftBorder && y > screenWidth && y < bonusTimeBottomBorder) {
-                    myGLView.myRenderer.mazeWorld.updateChangeTime();
+                } else if(x > bonusTimeLeftBorder && x < attackButtonLeftBorder && y > screenWidth && y < bonusTimeBottomBorder) {//BonusTime Button touched
+                    myGLView.myRenderer.updateChangeTime();
+                } else if(y < screenWidth) {//Game is paused
+                    myGLView.myRenderer.updatePausedStatus();
                 }
             case MotionEvent.ACTION_MOVE:
 

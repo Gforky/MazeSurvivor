@@ -38,7 +38,7 @@ public class GenerateRandomMaze {
 
         //Initialize the max cost as minimum int
         maxCost = Integer.MIN_VALUE;
-        costFromMonsterToSurvivor = 40;
+        costFromMonsterToSurvivor = 20;
         costFromTrapToSurvivor = 20;
 
         //Initializations for monsters
@@ -74,26 +74,24 @@ public class GenerateRandomMaze {
             if(valid(nextX, nextY)) {
                 maze[dir.moveX(X)][dir.moveY(Y)].Type = 'p';
                 if(localMax < maxCost && localMax > costFromBonusTimeToSurvivor && maxNumOfBonusTime > 0
-                        && canPutMonsterOrTrap(nextX, nextY)) {
+                        && canPutMonsterOrTrap(nextX, nextY, 'b')) {
 
                     maze[nextX][nextY].Type = 'b';
                     costFromBonusTimeToSurvivor += 100;
                     bonusTimes[maxNumOfBonusTime - 1] = new BonusTime(nextX, nextY);
                     maxNumOfBonusTime--;
                 } else if(localMax < maxCost && localMax > costFromMonsterToSurvivor && maxNumOfMonster > 0
-                        && canPutMonsterOrTrap(nextX, nextY)) {//check whether can set the cell as a monster
+                        && canPutMonsterOrTrap(nextX, nextY, 'm')) {//check whether can set the cell as a monster
                     //Can create monster, and the cost to the survivor is larger than distance from monster to survivor
                     //if set current cell as a monster, increase costFromMonsterToSurvivor by 40, set the next monster further
                     maze[nextX][nextY].Type = 'm';//set the cell as monster
-                    costFromMonsterToSurvivor += 20;
                     //create a monster by using current coordinates
                     monsters[maxNumOfMonster - 1] = new Monster(nextX, nextY, SystemClock.uptimeMillis());
                     maxNumOfMonster--;//decrease the available number of monsters by 1
                 } else if(localMax < maxCost && localMax > costFromTrapToSurvivor && maxNumOfTrap > 0
-                        && canPutMonsterOrTrap(nextX, nextY)) {//check if current cell can set as trap
+                        && canPutMonsterOrTrap(nextX, nextY, 't')) {//check if current cell can set as trap
 
                     maze[nextX][nextY].Type = 't';
-                    costFromTrapToSurvivor += 20;
                     traps[maxNumOfTrap - 1] = new Trap(nextX, nextY, SystemClock.uptimeMillis());
                     maxNumOfTrap--;
                 } else {
@@ -141,7 +139,7 @@ public class GenerateRandomMaze {
      * @param y
      * @return
      */
-    private boolean canPutMonsterOrTrap(int x, int y) {
+    private boolean canPutMonsterOrTrap(int x, int y, char item) {
 
         int leftBorder = y - 5 < 0 ? 0 : y - 5;
         int rightBorder = y + 5 >= col ? col - 1 : y + 5;
@@ -149,7 +147,7 @@ public class GenerateRandomMaze {
         int downBorder = x + 5 >= row ? row - 1 : x + 5;
         for(int r = upBorder; r <= downBorder; r++) {
             for(int c = leftBorder; c <= rightBorder; c++) {
-                if(maze[r][c].Type == 'm' || maze[r][c].Type == 't' || maze[r][c].Type == 'b') {
+                if(maze[r][c].Type == item) {
                 //within 11*11 area, already has the monster / trap, can't put a new one ar current position
                     return false;
                 }

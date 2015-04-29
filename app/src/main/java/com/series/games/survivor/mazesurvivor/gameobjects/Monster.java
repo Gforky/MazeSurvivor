@@ -34,14 +34,14 @@ public class Monster {
      *
      * @param maze
      */
-    public boolean move(MazeWorld.Cell[][] maze, long systemTime, boolean inChange, Survivor survivor) {
+    public boolean move(MazeWorld.Cell[][] maze, long systemTime, Survivor survivor) {
         //return value is to the survival status of the monster
         checkIfAlive(survivor.sword);
         //Get a random order array of directions, in order to move to a random direction each time
         Dir[] dirs = Dir.values();
         shuffle(dirs);
 
-        if(isAlive && !inChange && systemTime - prevTime >= 500L){//0.5 or more second past, and the maze is not in change
+        if(isAlive && systemTime - prevTime >= 500L){//0.5 or more second past, and the maze is not in change
 
             //Set the prev time to current system time
             prevTime = systemTime;
@@ -85,7 +85,7 @@ public class Monster {
     private boolean valid(MazeWorld.Cell[][] maze, int x, int y, Survivor survivor) {
 
         if(x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y].Type != 'w' && maze[x][y].Type != 'e' &&
-                maze[x][y].Type != 't' && (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
+                maze[x][y].Type != 't' && maze[x][y].Type != 'm' && (lastPosition == null || lastPosition[0] != x || lastPosition[1] != y)) {
             if (lastPosition == null) {
                 lastPosition = new int[]{indexX, indexY};
             } else {
@@ -94,8 +94,8 @@ public class Monster {
             }
             //Move to the new cell
             maze[indexX][indexY].Type = prevType;
-            //Avoid creating duplicate monsters and survivors
-            prevType = maze[x][y].Type == 'm' || maze[x][y].Type == 's' ? 'p' : maze[x][y].Type;
+            //Avoid creating duplicate survivors
+            prevType = maze[x][y].Type == 's' ? survivor.getPrevType() : maze[x][y].Type;
             updateX(x);
             updateY(y);
             //check whether the monster is killed

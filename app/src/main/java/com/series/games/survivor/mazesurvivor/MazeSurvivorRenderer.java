@@ -9,6 +9,7 @@ import com.series.games.survivor.mazesurvivor.gameobjects.BonusTimeBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.CountDownTimer;
 import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
 import com.series.games.survivor.mazesurvivor.gameobjects.GameTextures;
+import com.series.games.survivor.mazesurvivor.gameobjects.LevelSelector;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
 import com.series.games.survivor.mazesurvivor.gameobjects.MonsterKilledBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.ScoreBoard;
@@ -57,34 +58,47 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     //boolean flag to record whether the maze is in change or not
     private boolean inChange;
 
+    //boolean flag to check whether the game is paused
+    private boolean isPaused;
+    //Record the paused time
+    private long pausedTime;
+
     //Context get from the MazeSurvivorActivity
     private Context context;
 
     //record the game levels
     private int gameLevel;
 
+    //Game Level Selector
+    private LevelSelector levelSelector;
+
     //All the textures used for game rendering
     private GameTextures gameTextures;
 
     //Constructor
-    public MazeSurvivorRenderer(float ratio, int row, int col, Context context) {
+    public MazeSurvivorRenderer(float ratio, int level, Context context) {
         //Initializations
         this.context = context;
 
+        //Initialization of Game Level Selector
+        levelSelector = new LevelSelector();
+        //Get the initial level
+        levelSelector.updateSelector(level);
+
         //control the corner case as the player enter 0 as initial size
-        this.row = row == 0 ? 4 : row;
-        this.col = col == 0 ? 4 : col;
+        row = levelSelector.getMazeSize();
+        col = levelSelector.getMazeSize();
         findExit = false;
         inChange = false;
 
         //set the initial game level
-        gameLevel = (row - 2) / 2;
+        gameLevel = level;
 
         //Initialize the maze
         mazeWorld = new MazeWorld(row, col, ratio);
 
         //Get the maze from generator
-        maze = mazeWorld.generateMaze();//generate a M * N maze
+        maze = mazeWorld.generateMaze(levelSelector.getNumOfMonsters(), levelSelector.getNumOfTraps());//generate a M * N maze
 
         //Initialize direction buttons
         dirButtons = mazeWorld.getDirButtons();
@@ -106,6 +120,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         //set the game start time for current round
         startTime = SystemClock.uptimeMillis();
+
+        isPaused = false;
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -131,11 +147,13 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         //Redraw background color
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        //Check the game status
-        mazeWorld.checkIfGameOver();//Player is killed by the monster
+        if(!isPaused) {
+            //Check the game status
+            mazeWorld.checkIfGameOver();//Player is killed by the monster
 
-        //Check the survival status of monsters
-        mazeWorld.checkMonsterIsAlive();
+            //Check the survival status of monsters
+            mazeWorld.checkMonsterIsAlive();
+        }
 
         //draw all the elements on the game interface
         mazeWorld.drawMaze(gl,
@@ -148,7 +166,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 gameTextures.monsterTexture,
                 gameTextures.attackTexture,
                 inChange,
-                mazeWorld.survivor.isAlive
+                isPaused
         );
 
         scoreBoard.drawScoreBoard(gl,
@@ -178,14 +196,15 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         attackButton.drawAttackButton(gl, gameTextures.attackTexture);
 
+        //If game is paused, update the startTime until the game is continue
         countDownTimer.drawCountDownTime(gl, gameTextures.numTextures, mazeWorld.survivor.isAlive,
-                (mazeWorld.getChangeTime() - (SystemClock.uptimeMillis() - startTime)) / 1000L);
+                    (mazeWorld.getChangeTime() - (SystemClock.uptimeMillis() - (isPaused ? (startTime + (SystemClock.uptimeMillis() - pausedTime)) : startTime))) / 1000L);
 
         //player run out of current maze, create a new maze for the player
         if(mazeWorld.survivor.isAlive && findExit) {
             updateGame();
         } else if(mazeWorld.survivor.isAlive &&
-                (SystemClock.uptimeMillis() - startTime) >= mazeWorld.getChangeTime()) {
+                (SystemClock.uptimeMillis() - (isPaused ? (startTime + (SystemClock.uptimeMillis() - pausedTime)) : startTime)) >= mazeWorld.getChangeTime()) {
             //time to change the maze
             changeMaze();
         }
@@ -196,7 +215,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
      */
     private void updateLevel() {
 
-        gameLevel += 1;
+        gameLevel  = gameLevel < 99 ? gameLevel + 1 : gameLevel;
     }
 
     /**Function to update the player's position
@@ -205,7 +224,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
      */
     public void updateSurvivor(String move) {
 
-        if(mazeWorld.survivor.isAlive &&
+        if(mazeWorld.survivor.isAlive && !isPaused &&
                 mazeWorld.survivor.updateSurvivor(move, maze, inChange)) {//player reach the exit
             updateFindExit();
         }
@@ -215,12 +234,24 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         findExit = true;
     }
 
+    /**Update the maze change time when bonus time is used
+     *
+     */
+    public void updateChangeTime() {
+
+        if(!isPaused) {
+            mazeWorld.updateChangeTime();
+        }
+    }
+
     /**Function to use the sword to attack the monster
      *
      */
     public void updateSword() {
 
-        mazeWorld.survivorAttack(inChange);
+        if(!isPaused) {
+            mazeWorld.survivorAttack(inChange);
+        }
     }
 
     /**Change the game to the next level
@@ -231,22 +262,36 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
         findExit = false;//set the boolean flag to false
         inChange = true;//freeze the action of the player, avoid sending wrong player's position to the maze generator
 
-        //enlarge the maze's size to increase the difficulty of the game
-        row += 2;
-        col += 2;
-
-        //reset the player and re-generate the maze
-        mazeWorld.survivor = new Survivor(row, col);
-
-        //re-generate the maze
-        mazeWorld.updateMaze(row, col);//update the row and column of the maze
-        mazeWorld.updatePlayer(mazeWorld.survivor.getX(), mazeWorld.survivor.getY());//set the player at a new start position
-        maze = mazeWorld.generateMaze();
-
         updateLevel();//increase the game level by 1
-        startTime = SystemClock.uptimeMillis();//reset the start time
+        levelSelector.updateSelector(gameLevel);
+        row = levelSelector.getMazeSize();
+        col = levelSelector.getMazeSize();
 
-        inChange = false;//free the player
+         //reset the player and re-generate the maze
+         mazeWorld.survivor = new Survivor(row, col);
+
+         //re-generate the maze
+         mazeWorld.updateMaze(row, col);//update the row and column of the maze
+         mazeWorld.updatePlayer(mazeWorld.survivor.getX(), mazeWorld.survivor.getY());//set the player at a new start position
+         maze = mazeWorld.generateMaze(levelSelector.getNumOfMonsters(), levelSelector.getNumOfTraps());
+
+         startTime = SystemClock.uptimeMillis();//reset the start time
+
+         inChange = false;//free the player
+    }
+
+    /**Update the game pause status
+     *
+     */
+    public void updatePausedStatus() {
+
+        isPaused = !isPaused;
+        if(isPaused) {
+            //If game is paused, record the paused time
+            pausedTime = SystemClock.uptimeMillis();
+        } else {//update the startTime to the new time
+            startTime += (SystemClock.uptimeMillis() - pausedTime);
+        }
     }
 
     /**Change the maze
@@ -260,7 +305,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         //update the player's position, avoid changing the maze with the previous player's position
         mazeWorld.updatePlayer(mazeWorld.survivor.getX(), mazeWorld.survivor.getY());//set the player at a new start position
-        maze = mazeWorld.changeMaze();//change the maze
+        maze = mazeWorld.changeMaze(levelSelector.getNumOfMonsters(), levelSelector.getNumOfTraps());//change the maze
         inChange = false;//free the player
     }
 
