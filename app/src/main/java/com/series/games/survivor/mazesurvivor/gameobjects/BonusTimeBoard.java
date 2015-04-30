@@ -28,9 +28,9 @@ public class BonusTimeBoard {
         });
     }
 
-    public void drawBonusTimeBoard(GL10 gl, int bonusTime, int[] numTextures, int delayerNum) {
+    public void drawBonusTimeBoard(GL10 gl, int bonusTimeLogo, int[] numTextures, int delayerNum) {
 
-        timeLogo.draw(gl, bonusTime);
+        timeLogo.draw(gl, bonusTimeLogo);
         numOfDelayers.draw(gl, numTextures[delayerNum]);
     }
 }

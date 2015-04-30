@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import android.os.SystemClock;
+
 /**
  * Created by Malvin on 4/24/2015.
  * Monster move in the maze
@@ -16,7 +18,13 @@ public class Monster {
     //Survival status of the monster
     public boolean isAlive;
     //Record the previous type of monster's current cell
-    private char prevType;
+    public char prevType;
+    //The orientation of the monster
+    public String orientation;
+    //Record the previous texture change time
+    private long prevTextureChangeTime;
+    //Record the Texture ID
+    private int textureId;
 
     public Monster(int indexX, int indexY, long createTime) {
 
@@ -24,8 +32,11 @@ public class Monster {
         this.indexX = indexX;
         this.indexY = indexY;
         prevTime = createTime;
+        prevTextureChangeTime = createTime;
         isAlive = true;
         prevType = 'p';
+        orientation = "DOWN";
+        textureId = 0;
     }
 
     /**Function to move the monster, move it to a direction by 1 step every second
@@ -55,6 +66,21 @@ public class Monster {
                     maze[indexX][indexY].Type = 'p';
                     return false;
                 } else if(valid(maze, nextX, nextY, survivor)) {
+                    switch (dir) {//update the orientation of the monster
+
+                        case UP:
+                            orientation = "UP";
+                            break;
+                        case DOWN:
+                            orientation = "DOWN";
+                            break;
+                        case  LEFT:
+                            orientation = "LEFT";
+                            break;
+                        case RIGHT:
+                            orientation = "RIGHT";
+                            break;
+                    }
                     return isAlive;
                 }
             }
@@ -127,6 +153,19 @@ public class Monster {
     public int getY() {
 
         return indexY;
+    }
+
+    /**Function to update the texture to display, in order to make animation
+     *
+     * @return
+     */
+    public int getTextureId() {
+
+        if(SystemClock.uptimeMillis() - prevTextureChangeTime >= 150L) {
+            prevTextureChangeTime = SystemClock.uptimeMillis();
+            textureId = textureId < 2 ? textureId + 1 : 0;
+        }
+        return textureId;
     }
 
     public void updateX(int newX) {

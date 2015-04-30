@@ -1,5 +1,7 @@
 package com.series.games.survivor.mazesurvivor.gameobjects;
 
+import android.os.SystemClock;
+
 /**
  * Created by Luke on 4/20/2015.
  * Survivor class that implements all the player's actions
@@ -12,13 +14,17 @@ public class Survivor {
     //Survivor got a sword for attacking
     public Sword sword;
     //Record the player's orientation
-    private String orientation;
+    public String orientation;
     //Survive status of the player;
     public boolean isAlive;
     //Record the previous type of player's current cell
     private char prevType;
     //Record the number of bonus time delayers that player have
     private int numOfTimeDelayer;
+    //Record the previous texture change time
+    private long prevTextureChangeTime;
+    //Record the Texture ID
+    private int textureId;
 
     public Survivor(int row, int col) {
 
@@ -35,6 +41,8 @@ public class Survivor {
         prevType = 'p';
         //Initially have 0 time delayer
         numOfTimeDelayer = 0;
+        prevTextureChangeTime = SystemClock.uptimeMillis();
+        textureId = 0;
     }
 
     /**Update the survivor position according to the touch event
@@ -144,7 +152,7 @@ public class Survivor {
         return findExit;
     }
 
-    public int attack(MazeWorld.Cell[][] maze, boolean inChange, Monster[] monsters) {
+    public int attack(MazeWorld.Cell[][] maze, GenerateRandomMaze mazeGenerator, boolean inChange, Monster[] monsters) {
         //Return the number of monsters be killed in this time's attack
         int row = maze.length;
         int col = maze[0].length;
@@ -156,7 +164,7 @@ public class Survivor {
                 int attackLeft = Dir.LEFT.moveY(indexY);
                 if(isAlive && !inChange && attackLeft >= 0 && (maze[indexX][attackLeft].Type == 'p' || maze[indexX][attackLeft].Type == 'm')) {
                     //maze is not in change, and can attack
-                    beKilledMonsters = sword.attackMonster(indexX, attackLeft, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(indexX, attackLeft, maze, mazeGenerator, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -166,7 +174,7 @@ public class Survivor {
                 int attackRight = Dir.RIGHT.moveY(indexY);
                 if(isAlive && !inChange && attackRight < row && (maze[indexX][attackRight].Type == 'p' || maze[indexX][attackRight].Type == 'm')) {
                     //maze is not in change, and can attack
-                    beKilledMonsters = sword.attackMonster(indexX, attackRight, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(indexX, attackRight, maze, mazeGenerator, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -176,7 +184,7 @@ public class Survivor {
                 int attackUp = Dir.UP.moveX(indexX);
                 if(isAlive && !inChange && attackUp >= 0 && (maze[attackUp][indexY].Type == 'p' || maze[attackUp][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
-                    beKilledMonsters = sword.attackMonster(attackUp, indexY, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(attackUp, indexY, maze, mazeGenerator, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -186,7 +194,7 @@ public class Survivor {
                 int attackDown = Dir.DOWN.moveX(indexX);
                 if(isAlive && !inChange && attackDown < col && (maze[attackDown][indexY].Type == 'p' || maze[attackDown][indexY].Type == 'm')) {
                     //maze is not in change, and can attack
-                    beKilledMonsters = sword.attackMonster(attackDown, indexY, maze, monsters);
+                    beKilledMonsters = sword.attackMonster(attackDown, indexY, maze, mazeGenerator, monsters);
                     //withdraw the sword
                     sword.updateX(indexX);
                     sword.updateY(indexY);
@@ -209,6 +217,19 @@ public class Survivor {
     public char getPrevType() {
 
         return  prevType;
+    }
+
+    /**Function to update the texture to display, in order to make animation
+     *
+     * @return
+     */
+    public int getTextureId() {
+
+        if(SystemClock.uptimeMillis() - prevTextureChangeTime >= 150L) {
+            prevTextureChangeTime = SystemClock.uptimeMillis();
+            textureId = textureId < 2 ? textureId + 1 : 0;
+        }
+        return textureId;
     }
 
     public int getNumOfTimeDelayer() {

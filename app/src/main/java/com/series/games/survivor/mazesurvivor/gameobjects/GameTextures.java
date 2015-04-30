@@ -18,7 +18,10 @@ public class GameTextures {
     //texture Ids used for drawing maze
     public int wallTexture;
     public int pathTexture;
-    public int survivorTexture;
+    public int survivorUpTexture[];
+    public int survivorDownTexture[];
+    public int survivorLeftTexture[];
+    public int survivorRightTexture[];
     public int exitTexture;
     public int leftButtonTexture;
     public int rightButtonTexture;
@@ -26,17 +29,46 @@ public class GameTextures {
     public int downButtonTexture;
     public int lvSymbolTexture;
     public int numTextures[];
-    public int monsterTexture;
+    public int monsterLogoTexture;
+    public int monsterUpTexture[];
+    public int monsterDownTexture[];
+    public int monsterLeftTexture[];
+    public int monsterRightTexture[];
     public int attackTexture;
+    public int attackButtonTexture;
+    public int trapTexture;
     public int activeTrapTexture;
     public int bonusTimeTexture;
+    public int bonusTimeLogoTexture;
+    public int pauseAlertTexture;
+    public int gameOverAlertTexture;
+    public int gameClearAlertTexture;
 
     public GameTextures(GL10 gl, Context context) {
 
         //load the textures used for drawing maze, load the texture once, and bind it to GL_TEXTURE_2D when render
-        wallTexture = loadTexture(gl, context, R.drawable.brick_wall);
-        pathTexture = loadTexture(gl, context, R.drawable.grass);
-        survivorTexture = loadTexture(gl, context, R.drawable.survivor);
+        wallTexture = loadTexture(gl, context, R.drawable.wall);
+        pathTexture = loadTexture(gl, context, R.drawable.path);
+        survivorDownTexture = new int[]{
+                loadTexture(gl, context, R.drawable.survivordown1),
+                loadTexture(gl, context, R.drawable.survivordown2),
+                loadTexture(gl, context, R.drawable.survivordown3),
+        };
+        survivorUpTexture = new int[]{
+                loadTexture(gl, context, R.drawable.survivorup1),
+                loadTexture(gl, context, R.drawable.survivorup2),
+                loadTexture(gl, context, R.drawable.survivorup3)
+        };
+        survivorLeftTexture = new int[]{
+                loadTexture(gl, context, R.drawable.survivorleft1),
+                loadTexture(gl, context, R.drawable.survivorleft2),
+                loadTexture(gl, context, R.drawable.survivorleft3)
+        };
+        survivorRightTexture = new int[]{
+                loadTexture(gl, context, R.drawable.survivorright1),
+                loadTexture(gl, context, R.drawable.survivorright2),
+                loadTexture(gl, context, R.drawable.survivorright3)
+        };
         exitTexture = loadTexture(gl, context, R.drawable.exit);
         leftButtonTexture = loadTexture(gl, context, R.drawable.leftbutton);
         rightButtonTexture = loadTexture(gl, context, R.drawable.rightbutton);
@@ -55,10 +87,36 @@ public class GameTextures {
                 loadTexture(gl, context, R.drawable.num8),
                 loadTexture(gl, context, R.drawable.num9)
         };
-        monsterTexture = loadTexture(gl, context, R.drawable.monster);
+        monsterLogoTexture = loadTexture(gl, context, R.drawable.monsterlogo);
+        monsterUpTexture = new int[]{
+                loadTexture(gl, context, R.drawable.monsterup1),
+                loadTexture(gl, context, R.drawable.monsterup2),
+                loadTexture(gl, context, R.drawable.monsterup3)
+        };
+        monsterDownTexture = new int[]{
+                loadTexture(gl, context, R.drawable.monsterdown1),
+                loadTexture(gl, context, R.drawable.monsterdown2),
+                loadTexture(gl, context, R.drawable.monsterdown3)
+        };
+        monsterLeftTexture = new int[]{
+                loadTexture(gl, context, R.drawable.monsterleft1),
+                loadTexture(gl, context, R.drawable.monsterleft2),
+                loadTexture(gl, context, R.drawable.monsterleft3)
+        };
+        monsterRightTexture = new int[]{
+                loadTexture(gl, context, R.drawable.monsterright1),
+                loadTexture(gl, context, R.drawable.monsterright2),
+                loadTexture(gl, context, R.drawable.monsterright3)
+        };
         attackTexture = loadTexture(gl, context, R.drawable.attack);
-        activeTrapTexture = loadTexture(gl, context, R.drawable.trap);
+        attackButtonTexture = loadTexture(gl, context, R.drawable.attackbutton);
+        trapTexture = loadTexture(gl, context, R.drawable.trap);
+        activeTrapTexture = loadTexture(gl, context, R.drawable.activetrap);
         bonusTimeTexture = loadTexture(gl, context, R.drawable.bonustime);
+        bonusTimeLogoTexture = loadTexture(gl, context, R.drawable.bonustimelogo);
+        pauseAlertTexture = loadTexture(gl, context, R.drawable.pause);
+        gameOverAlertTexture = loadTexture(gl, context, R.drawable.gameover);
+        gameClearAlertTexture = loadTexture(gl, context, R.drawable.youwin);
     }
 
     /**Function to load the textures

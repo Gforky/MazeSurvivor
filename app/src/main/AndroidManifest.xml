@@ -10,6 +10,7 @@
         <activity
             android:name="com.series.games.survivor.mazesurvivor.MazeSurvivorActivity"
             android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:label="@string/title_activity_maze_survivor" >
         </activity>
         <activity

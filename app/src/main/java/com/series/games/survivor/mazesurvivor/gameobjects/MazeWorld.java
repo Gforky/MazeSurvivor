@@ -34,7 +34,7 @@ public class MazeWorld {
     private GenerateRandomMaze mazeGenerator;
     private Monster[] monsters;
     //Record the number of monsters be killed, if exceed 100, only display 99
-    private int numOfKilledMonsters;
+    private int numOfAliveMonsters;
     private Trap[] traps;
 
     //Time to change the maze without bonus time
@@ -53,8 +53,6 @@ public class MazeWorld {
 
         //Initialize the maze generator
         mazeGenerator = new GenerateRandomMaze();
-
-        numOfKilledMonsters = 0;
 
         //Initialize the direction buttons
         dirButtons = new DirButtons(ratio);
@@ -101,8 +99,9 @@ public class MazeWorld {
 
         mazeGenerator.generateMaze(maze, survivor.getX(), survivor.getY(), maxNumOfMonsters, maxNumOfTraps);
         monsters = mazeGenerator.getMonsters();
+        numOfAliveMonsters = mazeGenerator.getNumOfMonsters();
         traps = mazeGenerator.getTraps();
-        changeTime = 1000L * getMaxCost() / 4;
+        changeTime = 1000L * getMaxCost() / 3;
         return maze;
     }
 
@@ -140,9 +139,7 @@ public class MazeWorld {
      *
      * @param gl
      */
-    public void drawMaze(GL10 gl, int wallTexture, int pathTexture, int survivorTexture, int activeTrapTexture,
-                         int bonusTimeTexture, int exitTexture, int monsterTexture, int swordTexture,
-                         boolean inChange, boolean isPaused) {
+    public void drawMaze(GL10 gl,GameTextures gameTextures, boolean inChange, boolean isPaused) {
         //Update the monsters' positions, if game is still continuing
         if(survivor.isAlive && !inChange && !isPaused) {
             updateMonsters();
@@ -154,25 +151,53 @@ public class MazeWorld {
         for(int r = 0; r < row; r++) {
             for(int c = 0; c < col; c++) {
                 if(maze[r][c].Type == 'w') {//draw the wall cell
-                    maze[r][c].mazeCell.draw(gl, wallTexture);
+                    maze[r][c].mazeCell.draw(gl, gameTextures.wallTexture);
                 } else if(maze[r][c].Type == 'p') {//draw the path cell
-                    maze[r][c].mazeCell.draw(gl, pathTexture);
+                    maze[r][c].mazeCell.draw(gl, gameTextures.pathTexture);
                 } else if(maze[r][c].Type == 's') {//draw the survivor
-                    maze[r][c].mazeCell.draw(gl, survivorTexture);
+                    switch (survivor.orientation) {
+                        case "UP":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.survivorUpTexture[survivor.getTextureId()]);
+                            break;
+                        case "DOWN":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.survivorDownTexture[survivor.getTextureId()]);
+                            break;
+                        case "LEFT":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.survivorLeftTexture[survivor.getTextureId()]);
+                            break;
+                        case "RIGHT":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.survivorRightTexture[survivor.getTextureId()]);
+                            break;
+                    }
                 } else if(maze[r][c].Type == 'e') {//draw the exit
-                    maze[r][c].mazeCell.draw(gl, exitTexture);
+                    maze[r][c].mazeCell.draw(gl, gameTextures.exitTexture);
                 } else if(maze[r][c].Type == 'm') {//draw monsters
-                    maze[r][c].mazeCell.draw(gl, monsterTexture);
+                    Monster currentMonster = mazeGenerator.getMonster(r, c);
+                    switch (currentMonster.orientation) {
+
+                        case "UP":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.monsterUpTexture[currentMonster.getTextureId()]);
+                            break;
+                        case "DOWN":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.monsterDownTexture[currentMonster.getTextureId()]);
+                            break;
+                        case "LEFT":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.monsterLeftTexture[currentMonster.getTextureId()]);
+                            break;
+                        case "RIGHT":
+                            maze[r][c].mazeCell.draw(gl, gameTextures.monsterRightTexture[currentMonster.getTextureId()]);
+                            break;
+                    }
                 } else if(maze[r][c].Type == 'a') {//draw the sword in attack
-                    maze[r][c].mazeCell.draw(gl, swordTexture);
+                    maze[r][c].mazeCell.draw(gl, gameTextures.attackTexture);
                 } else if(maze[r][c].Type == 't') {//draw the trap
                     if(mazeGenerator.getTrap(r, c).getActiveStatus()) {//Trap is active
-                        maze[r][c].mazeCell.draw(gl, activeTrapTexture);
+                        maze[r][c].mazeCell.draw(gl, gameTextures.activeTrapTexture);
                     } else {//Trap is not active
-                        maze[r][c].mazeCell.draw(gl, pathTexture);
+                        maze[r][c].mazeCell.draw(gl, gameTextures.trapTexture);
                     }
                 } else if(maze[r][c].Type == 'b') {//draw the bonus time
-                    maze[r][c].mazeCell.draw(gl, bonusTimeTexture);
+                    maze[r][c].mazeCell.draw(gl, gameTextures.bonusTimeTexture);
                 }
             }
         }
@@ -187,7 +212,7 @@ public class MazeWorld {
         for(Monster monster : mazeGenerator.getMonsters()) {
             if(monster != null && monster.isAlive) {//move the monster if it is alive
                 if(!monster.move(maze, SystemClock.uptimeMillis(), survivor)) {
-                    numOfKilledMonsters = numOfKilledMonsters < 99 ? numOfKilledMonsters + 1 : numOfKilledMonsters;
+                    numOfAliveMonsters = numOfAliveMonsters == 0 ? 0 : numOfAliveMonsters - 1;
                 }
             }
         }
@@ -199,9 +224,8 @@ public class MazeWorld {
      */
     public void survivorAttack(boolean inChange) {
 
-        int beKilledMonsters = survivor.attack(maze, inChange, monsters);
-        int totalNum = numOfKilledMonsters + beKilledMonsters < 99 ? numOfKilledMonsters + beKilledMonsters : 99;
-        numOfKilledMonsters = numOfKilledMonsters < 99 ? totalNum : numOfKilledMonsters;
+        int beKilledMonsters = survivor.attack(maze, mazeGenerator, inChange, monsters);
+        numOfAliveMonsters = numOfAliveMonsters - beKilledMonsters < 0 ? 0 : numOfAliveMonsters - beKilledMonsters;
     }
 
     /**Function to check the traps' status
@@ -259,7 +283,7 @@ public class MazeWorld {
         for(Monster monster : monsters) {
             if(monster != null) {
                 if(!monster.checkIfAlive(survivor.sword)) {
-                    numOfKilledMonsters = numOfKilledMonsters < 99 ? numOfKilledMonsters + 1 : numOfKilledMonsters;
+                    numOfAliveMonsters = numOfAliveMonsters == 0 ? 0 : numOfAliveMonsters - 1;
                 }
             }
         }
@@ -290,8 +314,8 @@ public class MazeWorld {
         return changeTime;
     }
 
-    public int getNumOfKilledMonsters() {
+    public int getNumOfAliveMonsters() {
 
-        return numOfKilledMonsters;
+        return numOfAliveMonsters;
     }
 }

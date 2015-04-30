@@ -90,7 +90,7 @@ public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListe
                     //get the initial level from menu activity
                     for (int index = 0; index < array.length; index++) {
                         level += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
-                    } if(level == 0 || level > 50) {//Input exceed the highest level
+                    } if(level == 0 || level > 99) {//Input exceed the highest level
                         InputAlert.show();
                     } else {
                         intent.putExtra(EXTRA_MESSAGE, message);

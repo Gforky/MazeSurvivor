@@ -17,9 +17,9 @@ public class LevelSelector {
             mazeSize = level + 3;
         } else if(level >= 8 && level <= 35) {
             //Level 8-35, maze size 11-24, increase by 1 every 2 levels,
-            // numOfMonster and numOfTraps 2 - 14, increase by 2 every 2 levels
+            // numOfMonster and numOfTraps 2 - 14, increase by 2 every 4 levels
             mazeSize = 11 + (level - 8) / 2;
-            numOfMonsters = 2 * ((level - 8) / 2 + 1);
+            numOfMonsters = 2 * ((mazeSize - 11) / 2 + 1);
             numOfTraps = numOfMonsters;
         } else if(level >= 36 && level <= 50) {
             //Level 36-50, maze size 25-29, increase by 1 every 3 levels,

@@ -20,8 +20,8 @@ public class AttackButton {
         });
     }
 
-    public void drawAttackButton(GL10 gl, int attackTexture) {
+    public void drawAttackButton(GL10 gl, int attackButtonTexture) {
 
-        attackButton.draw(gl, attackTexture);
+        attackButton.draw(gl, attackButtonTexture);
     }
 }

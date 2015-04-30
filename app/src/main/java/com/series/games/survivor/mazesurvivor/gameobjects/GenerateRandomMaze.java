@@ -168,6 +168,30 @@ public class GenerateRandomMaze {
         return monsters;
     }
 
+    //get the monster with corresponding coordinates
+    public Monster getMonster(int x, int y) {
+
+        for(Monster monster : monsters) {
+
+            if(monster != null && monster.getX() == x && monster.getY() == y) {
+                return monster;
+            }
+        }
+        return null;
+    }
+
+    //get number of alive monsters
+    public int getNumOfMonsters() {
+
+        int num = 0;
+        for(Monster monster : monsters) {
+            if(monster != null) {
+                num++;
+            }
+        }
+        return num;
+    }
+
     //get the trap with corresponding coordinates
     public Trap getTrap(int x, int y) {
 

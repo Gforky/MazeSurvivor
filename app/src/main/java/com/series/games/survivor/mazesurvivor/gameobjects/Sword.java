@@ -11,6 +11,7 @@ public class Sword {
     private int indexX;
     private int indexY;
     public boolean outForAttack;
+    public char prevType;//record the previous type of the attacking cell
 
     public Sword(int indexX, int indexY) {
         this.indexX = indexX;
@@ -23,16 +24,21 @@ public class Sword {
      * @param newX
      * @param newY
      */
-    public int attackMonster(int newX, int newY, MazeWorld.Cell[][] maze, Monster[] monsters) {
+    public int attackMonster(int newX, int newY, MazeWorld.Cell[][] maze, GenerateRandomMaze mazeGenerator, Monster[] monsters) {
         //Return the number of monsters be kill in this time's attack
         int beKilledMonsters = 0;
         if(!outForAttack) {//Sword is not out for attack
             outForAttack = true;
             updateX(newX);
             updateY(newY);
+            if(maze[indexX][indexY].Type == 'm') {
+                prevType = mazeGenerator.getMonster(indexX, indexY).prevType;
+            } else {
+                prevType = 'p';
+            }
             maze[indexX][indexY].Type = 'a';
             beKilledMonsters = inActive(SystemClock.uptimeMillis(), monsters);
-            maze[indexX][indexY].Type = 'p';
+            maze[indexX][indexY].Type = prevType;
             outForAttack = false;
             return beKilledMonsters;
         }
