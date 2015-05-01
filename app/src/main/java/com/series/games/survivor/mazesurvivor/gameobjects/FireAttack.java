@@ -6,14 +6,14 @@ import android.os.SystemClock;
  * Created by Luke on 4/25/2015.
  * Sword used by the player
  */
-public class Sword {
+public class FireAttack {
 
     private int indexX;
     private int indexY;
     public boolean outForAttack;
     public char prevType;//record the previous type of the attacking cell
 
-    public Sword(int indexX, int indexY) {
+    public FireAttack(int indexX, int indexY) {
         this.indexX = indexX;
         this.indexY = indexY;
         outForAttack = false;

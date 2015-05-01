@@ -47,7 +47,7 @@ public class Monster {
      */
     public boolean move(MazeWorld.Cell[][] maze, long systemTime, Survivor survivor) {
         //return value is to the survival status of the monster
-        checkIfAlive(survivor.sword);
+        checkIfAlive(survivor.fireAttack);
         //Get a random order array of directions, in order to move to a random direction each time
         Dir[] dirs = Dir.values();
         shuffle(dirs);
@@ -120,12 +120,18 @@ public class Monster {
             }
             //Move to the new cell
             maze[indexX][indexY].Type = prevType;
-            //Avoid creating duplicate survivors
-            prevType = maze[x][y].Type == 's' ? survivor.getPrevType() : maze[x][y].Type;
+            //Avoid creating duplicate survivors, and fire balls
+            if(maze[x][y].Type == 's') {
+                prevType = survivor.getPrevType();
+            } else if(maze[x][y].Type == 'a') {
+                prevType = survivor.fireAttack.prevType;
+            } else {
+                prevType = maze[x][y].Type;
+            }
             updateX(x);
             updateY(y);
             //check whether the monster is killed
-            if(checkIfAlive(survivor.sword)) {
+            if(checkIfAlive(survivor.fireAttack)) {
                 maze[indexX][indexY].Type = 'm';
             }
             return true;//no matter be killed or not, moved to the new cell
@@ -136,9 +142,9 @@ public class Monster {
     /**Function to check the survival status of the monster
      *
      */
-    public boolean checkIfAlive(Sword sword) {
+    public boolean checkIfAlive(FireAttack fireAttack) {
 
-        if(isAlive && sword.outForAttack && indexX == sword.getX() && indexY == sword.getY()) {
+        if(isAlive && fireAttack.outForAttack && indexX == fireAttack.getX() && indexY == fireAttack.getY()) {
             isAlive = false;
             return false;
         }

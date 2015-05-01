@@ -16,6 +16,7 @@ public class MazeWorld {
         public MazeCell mazeCell;
 
         public Cell(char Type, MazeCell mazeCell) {
+            //'p' means path, 'w' mean wall, 's' means survivor, 'a' means attack, 'm' means monster, 'b' means bonus time, 'e' means exit, 't' means trap
             this.Type = Type;
             this.mazeCell = mazeCell;
         }
@@ -58,7 +59,7 @@ public class MazeWorld {
         dirButtons = new DirButtons(ratio);
     }
 
-    public Cell[][] generateMaze(int maxNumOfMonsters, int maxNumOfTraps) {
+    public Cell[][] generateMaze(int maxNumOfMonsters, int maxNumOfTraps, int gameLevel) {
 
         maze = new Cell[row][col];//store the cells in maze
 
@@ -101,14 +102,15 @@ public class MazeWorld {
         monsters = mazeGenerator.getMonsters();
         numOfAliveMonsters = mazeGenerator.getNumOfMonsters();
         traps = mazeGenerator.getTraps();
-        changeTime = 1000L * getMaxCost() / 3;
+        //Formula to calculate the maze change time, in order to make the game hard but not crazy
+        changeTime = gameLevel < 3 ? 3000L : 1000L * (getMaxCost() / 3 + numOfAliveMonsters + mazeGenerator.getNumOfTraps());
         return maze;
     }
 
-    public Cell[][] changeMaze(int maxNumOfMonsters, int maxNumOfTraps) {
+    public Cell[][] changeMaze(int maxNumOfMonsters, int maxNumOfTraps, int gameLevel) {
 
         resetMaze();
-        generateMaze(maxNumOfMonsters, maxNumOfTraps);
+        generateMaze(maxNumOfMonsters, maxNumOfTraps, gameLevel);
         return maze;
     }
 
@@ -282,7 +284,7 @@ public class MazeWorld {
 
         for(Monster monster : monsters) {
             if(monster != null) {
-                if(!monster.checkIfAlive(survivor.sword)) {
+                if(!monster.checkIfAlive(survivor.fireAttack)) {
                     numOfAliveMonsters = numOfAliveMonsters == 0 ? 0 : numOfAliveMonsters - 1;
                 }
             }

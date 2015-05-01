@@ -38,8 +38,8 @@ public class GenerateRandomMaze {
 
         //Initialize the max cost as minimum int
         maxCost = Integer.MIN_VALUE;
-        costFromMonsterToSurvivor = 20;
-        costFromTrapToSurvivor = 20;
+        costFromMonsterToSurvivor = 10;
+        costFromTrapToSurvivor = 10;
 
         //Initializations for monsters
         this.maxNumOfMonster = maxNumOfMonster;
@@ -207,5 +207,17 @@ public class GenerateRandomMaze {
     public Trap[] getTraps() {
 
         return traps;
+    }
+
+    //get the number of created traps
+    public int getNumOfTraps() {
+
+        int num = 0;
+        for(Trap trap : traps) {
+            if(trap != null) {
+                num++;
+            }
+        }
+        return num;
     }
 }

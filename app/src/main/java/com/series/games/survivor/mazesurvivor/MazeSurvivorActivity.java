@@ -13,6 +13,8 @@ import android.view.WindowManager;
 import com.series.games.survivor.SurvivorGamesMenu;
 import com.series.survivor.survivorgames.R;
 
+import java.util.ArrayList;
+
 
 public class MazeSurvivorActivity extends Activity {
 
@@ -36,12 +38,19 @@ public class MazeSurvivorActivity extends Activity {
         //Receive the message from SurvivorGamesMenu Activity
         Intent intent = getIntent();
         String message = intent.getStringExtra(SurvivorGamesMenu.EXTRA_MESSAGE);
+        ArrayList<Character> levelArray = new ArrayList<Character>();
+        int charIndex = 0;
+        while(message.charAt(charIndex) != ' ') {
+            levelArray.add(message.charAt(charIndex));
+            charIndex++;
+        }
+        charIndex++;
+        char mode = message.charAt(charIndex);
         //convert string to int
         int level = 0;
-        char[] array = message.toCharArray();
         //get the initial level from menu activity
-        for (int index = 0; index < array.length; index++) {
-            level += ((array[index] - '0') * Math.pow(10, array.length - 1 - index));
+        for (int index = 0; index < levelArray.size(); index++) {
+            level += ((levelArray.get(index) - '0') * Math.pow(10, levelArray.size() - 1 - index));
         }
 
         //get the screen's width and height ratio
@@ -63,7 +72,7 @@ public class MazeSurvivorActivity extends Activity {
 
         //Create an instance of GLSurfaceView
         //and set it as the content view
-        myGLView = new MazeSurvivorView(this, level, ratio);
+        myGLView = new MazeSurvivorView(this, level, ratio, mode);
         setContentView(myGLView);
     }
 
