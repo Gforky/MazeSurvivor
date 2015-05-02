@@ -4,7 +4,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.series.games.survivor.GameIntroduction">
+    tools:context="com.series.games.survivor.GameIntroduction"
+    android:id="@+id/game_introduction">
 
     <TextView
         android:layout_width="wrap_content"
@@ -20,23 +21,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/game_rule"
-        android:id="@+id/game_rule"
-        android:layout_below="@+id/move_rule"
+        android:text="@string/marathon_mode_rule"
+        android:id="@+id/marathon_mode_rule"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="42dp" />
+        android:layout_alignParentStart="false"
+        android:layout_marginBottom="80dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/marathon_mode_rule"
-        android:id="@+id/marathon_mode_rule"
-        android:layout_above="@+id/exercise_mode_rule"
+        android:text="@string/game_rule"
+        android:id="@+id/game_rule"
+        android:layout_below="@+id/move_rule"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="46dp" />
+        android:layout_marginTop="45dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -45,8 +46,30 @@
         android:text="@string/exercise_mode_rule"
         android:id="@+id/exercise_mode_rule"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/attack_rule"
+        android:id="@+id/attack_rule"
+        android:layout_below="@+id/game_rule"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="80dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/pause_rule"
+        android:id="@+id/pause_rule"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -54,8 +77,10 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/bonus_time_rule"
         android:id="@+id/bonus_time_rule"
-        android:layout_centerVertical="true"
+        android:layout_above="@+id/marathon_mode_rule"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="70dp" />
 
 </RelativeLayout>

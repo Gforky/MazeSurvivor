@@ -28,6 +28,7 @@
         android:ems="10"
         android:id="@+id/set_level_of_game"
         android:hint="@string/level_of_game"
+        android:textColor="#ffffff"
         android:layout_below="@+id/marathon_mode_button"
         android:layout_alignParentLeft="true"
         android:layout_alignRight="@+id/displayed_highest_score_time"

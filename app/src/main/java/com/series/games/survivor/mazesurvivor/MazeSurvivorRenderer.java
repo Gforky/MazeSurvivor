@@ -329,12 +329,27 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
      */
     public void updatePausedStatus() {
 
-        isPaused = !isPaused;
-        if(isPaused) {
-            //If game is paused, record the paused time
-            pausedTime = SystemClock.uptimeMillis();
-        } else {//update the startTime to the new time
-            prevMazeChangeTime += (SystemClock.uptimeMillis() - pausedTime);
+        if(mazeWorld.survivor.isAlive) {//Game in continue
+            isPaused = !isPaused;
+            if (isPaused) {
+                //If game is paused, record the paused time
+                pausedTime = SystemClock.uptimeMillis();
+            } else {//update the startTime to the new time
+                prevMazeChangeTime += (SystemClock.uptimeMillis() - pausedTime);
+            }
+        } else if(mode == 'm'){//Game over, restart the game when in marathon mode
+            gameLevel = 0;
+            //Get the initial level
+            findExit = false;
+            inChange = false;
+            canWrite = true;
+            mazeWorld.survivor.isAlive = true;
+            updateGame();
+            //set the game start time for current round
+            gameStartTime = SystemClock.uptimeMillis();
+            timeUsed = 0;
+
+            isPaused = false;
         }
     }
 
