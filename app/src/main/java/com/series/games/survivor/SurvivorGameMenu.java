@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.series.games.survivor.mazesurvivor.MazeSurvivorActivity;
@@ -27,7 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 
-public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListener {
+public class SurvivorGameMenu extends ActionBarActivity implements OnClickListener {
 
     public final static String EXTRA_MESSAGE = "com.series.survivor.MESSAGE";
     private Button mazeMarathonButton;
@@ -40,7 +42,7 @@ public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survivor_games_menu);
-        mazeMarathonButton = (Button) findViewById(R.id.maze_marathon_button);
+        mazeMarathonButton = (Button) findViewById(R.id.marathon_mode_button);
         mazeExerciseButton = (Button) findViewById(R.id.maze_exercise_button);
         mazeMarathonButton.setOnClickListener(this);
         mazeExerciseButton.setOnClickListener(this);
@@ -64,6 +66,17 @@ public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListe
         String leastGameTime = highestScore.substring(index + 1);
         highestScoreLevelTextView.setText("Level " + highestLevel);
         highestScoreTimeTextView.setText("Within " + leastGameTime + "ms");
+
+        //Display the game menu animation
+        final ImageView animation = (ImageView) findViewById(R.id.game_menu_animation);
+        animation.setBackgroundResource(R.drawable.game_menu_animation);
+        animation.post(new Runnable() {
+            @Override
+            public void run() {
+                AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground();
+                animationDrawable.start();
+            }
+        });
     }
 
     @Override
@@ -98,6 +111,8 @@ public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, GameIntroduction.class);
+            startActivity(intent);
             return true;
         }
 
@@ -149,7 +164,7 @@ public class SurvivorGamesMenu extends ActionBarActivity implements OnClickListe
                 break;
 
             //maze marathon button be clicked
-            case R.id.maze_marathon_button:
+            case R.id.marathon_mode_button:
                 //Do something here in response to the button
                 intent.putExtra(EXTRA_MESSAGE, "1 m");//Start with level 1, in marathon mode
                 startActivity(intent);

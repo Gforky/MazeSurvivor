@@ -4,19 +4,22 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.series.games.survivor.SurvivorGamesMenu"
+    android:background="@drawable/game_menu_background"
+    tools:context="com.series.games.survivor.SurvivorGameMenu"
     android:theme="@style/Base.Animation.AppCompat.DropDownUp">
 
     <Button
+        android:background="@drawable/game_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/jump_to_maze_survivor"
+        android:text="@string/exercise_mode"
         android:id="@+id/maze_exercise_button"
+        android:textAllCaps="false"
+        style="@style/game_button_text"
         android:onClick="onClick"
-        android:layout_marginTop="155dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignTop="@+id/set_level_of_game"
+        android:layout_alignRight="@+id/marathon_mode_button"
+        android:layout_alignEnd="@+id/marathon_mode_button" />
 
     <EditText
         android:layout_width="100dip"
@@ -25,31 +28,24 @@
         android:ems="10"
         android:id="@+id/set_level_of_game"
         android:hint="@string/level_of_game"
-        android:layout_alignTop="@+id/maze_exercise_button"
+        android:layout_below="@+id/marathon_mode_button"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignRight="@+id/displayed_highest_score_time"
+        android:layout_alignEnd="@+id/displayed_highest_score_time"
+        android:layout_marginTop="50dp"/>
 
     <Button
+        android:background="@drawable/game_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/maze_marathon"
-        android:id="@+id/maze_marathon_button"
+        android:textAllCaps="false"
+        android:text="@string/marathon_mode"
+        android:id="@+id/marathon_mode_button"
         android:onClick="onClick"
-        android:textColor="#ffff492e"
-        android:textStyle="bold|italic"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/set_level_of_game"
-        android:layout_toEndOf="@+id/set_level_of_game" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/highest_score"
-        android:id="@+id/highest_score_introduction"
+        style="@style/game_button_text"
         android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -57,11 +53,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Large Text"
         android:id="@+id/displayed_highest_score_level"
-        android:layout_below="@+id/highest_score_introduction"
+        style="@style/game_menu_text"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/maze_exercise_button"
-        android:layout_alignEnd="@+id/maze_exercise_button" />
+        android:layout_above="@+id/displayed_highest_score_time" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,10 +63,28 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Large Text"
         android:id="@+id/displayed_highest_score_time"
-        android:layout_below="@+id/displayed_highest_score_level"
+        style="@style/game_menu_text"
+        android:layout_above="@+id/marathon_mode_button"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/maze_exercise_button"
-        android:layout_alignEnd="@+id/maze_exercise_button" />
+        android:layout_marginBottom="88dp" />
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:id="@+id/game_menu_animation"
+        android:layout_alignTop="@+id/marathon_mode_button"
+        android:layout_alignLeft="@+id/displayed_highest_score_level"
+        android:layout_alignStart="@+id/displayed_highest_score_level" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/highest_score"
+        android:id="@+id/highest_score_intro"
+        style="@style/game_menu_text"
+        android:layout_above="@+id/displayed_highest_score_level"
+        android:layout_alignLeft="@+id/displayed_highest_score_level"
+        android:layout_alignStart="@+id/displayed_highest_score_level" />
 
 </RelativeLayout>

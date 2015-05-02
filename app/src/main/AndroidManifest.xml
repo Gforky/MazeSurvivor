@@ -2,26 +2,44 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.series.survivor.survivorgames" >
 
+    <uses-sdk android:minSdkVersion="16" />
+
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_logo"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.series.games.survivor.mazesurvivor.MazeSurvivorActivity"
+            android:label="@string/title_activity_maze_survivor"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:label="@string/title_activity_maze_survivor" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
         <activity
-            android:name="com.series.games.survivor.SurvivorGamesMenu"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_survivor_games_menu" >
+            android:name="com.series.games.survivor.SurvivorGameMenu"
+            android:label="@string/title_activity_survivor_games_menu"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.series.games.survivor.GameIntroduction"
+            android:label="@string/title_activity_game_introduction"
+            android:parentActivityName="com.series.games.survivor.SurvivorGameMenu" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.series.games.survivor.SurvivorGameMenu" />
         </activity>
     </application>
 

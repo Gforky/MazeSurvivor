@@ -1,11 +1,17 @@
 <resources>
-    <string name="app_name">SurvivorGames</string>
+    <string name="app_name">MazeSurvivor</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Help</string>
     <string name="level_of_game">Enter 1 - 99</string>
-    <string name="maze_marathon">MazeMarathon</string>
+    <string name="marathon_mode">Marathon Mode</string>
     <string name="highest_score">Your Highest Score</string>
-    <string name="jump_to_maze_survivor">MazeSurvivor</string>
+    <string name="exercise_mode">Exercise Mode</string>
     <string name="title_activity_maze_survivor">MazeSurvivorActivity</string>
-    <string name="title_activity_survivor_games_menu">SurvivorGamesMenu</string>
+    <string name="title_activity_survivor_games_menu">MazeSurvivor</string>
+    <string name="title_activity_game_introduction">GameIntroduction</string>
+    <string name="move_rule">1. Move to one direction by one cell each time.</string>
+    <string name="game_rule">2. Use less time to hit the higher level, maze will change within random time.</string>
+    <string name="bonus_time_rule">3. Use bonus time sand clock to extend the maze change time by 5 seconds.</string>
+    <string name="marathon_mode_rule">4. Marathon Mode: Start with level 1 and record the higher score.</string>
+    <string name="exercise_mode_rule">5. Exercise Mode: Choose any level you want to start with, but will not record the score.</string>
 </resources>

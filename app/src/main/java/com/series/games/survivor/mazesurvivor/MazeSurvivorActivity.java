@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import com.series.games.survivor.SurvivorGamesMenu;
+import com.series.games.survivor.SurvivorGameMenu;
 import com.series.survivor.survivorgames.R;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class MazeSurvivorActivity extends Activity {
 
         //Receive the message from SurvivorGamesMenu Activity
         Intent intent = getIntent();
-        String message = intent.getStringExtra(SurvivorGamesMenu.EXTRA_MESSAGE);
+        String message = intent.getStringExtra(SurvivorGameMenu.EXTRA_MESSAGE);
         ArrayList<Character> levelArray = new ArrayList<Character>();
         int charIndex = 0;
         while(message.charAt(charIndex) != ' ') {
