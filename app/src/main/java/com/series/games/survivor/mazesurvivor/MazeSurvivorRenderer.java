@@ -14,6 +14,7 @@ import com.series.games.survivor.mazesurvivor.gameobjects.DirButtons;
 import com.series.games.survivor.mazesurvivor.gameobjects.GameTextures;
 import com.series.games.survivor.mazesurvivor.gameobjects.LevelSelector;
 import com.series.games.survivor.mazesurvivor.gameobjects.MazeWorld;
+import com.series.games.survivor.mazesurvivor.gameobjects.RestartAlertBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.ScoreBoard;
 import com.series.games.survivor.mazesurvivor.gameobjects.Survivor;
 
@@ -70,6 +71,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
     //Alert Board
     private AlertBoard alertBoard;
+    //RestartAlert Board
+    private RestartAlertBoard restartAlertBoard;
 
     //record the status of the player, if the player find the exit, set it to true
     private boolean findExit;
@@ -146,6 +149,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
 
         //Initialize Alert Board
         alertBoard = new AlertBoard(ratio);
+        restartAlertBoard = new RestartAlertBoard(ratio);
 
         //set the game start time for current round
         prevMazeChangeTime = SystemClock.uptimeMillis();
@@ -234,6 +238,8 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
                 (SystemClock.uptimeMillis() - (isPaused ? (prevMazeChangeTime + (SystemClock.uptimeMillis() - pausedTime)) : prevMazeChangeTime)) >= mazeWorld.getChangeTime()) {
             //time to change the maze
             changeMaze();
+        } else if(mazeWorld.survivor.isAlive && isPaused) {//Game is paused, update the game start time, avoid adding extra game time
+            gameStartTime += SystemClock.uptimeMillis() - pausedTime;
         } else if(!mazeWorld.survivor.isAlive) {//Game Over, display game over alert, update the highest score if exceed the record
             if(canWrite && mode == 'm') {//Avoid writing duplicate files, and only record the new highest score in marathon mode
                 long[] highestScore = readFromFile();
@@ -247,6 +253,9 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             }
             canWrite = false;
             alertBoard.drawAlertBoard(gl, gameTextures.gameOverAlertTexture);
+            if(mode == 'm') {//Only marathon mode can restart game
+                restartAlertBoard.drawRestartAlertBoard(gl, gameTextures.restartTexture);
+            }
         } else if(gameLevel > 99) {//Clear all the levels, win the game
             alertBoard.drawAlertBoard(gl, gameTextures.gameClearAlertTexture);
         }
@@ -289,7 +298,7 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
     /**Function to use the sword to attack the monster
      *
      */
-    public void updateSword() {
+    public void updateFireAttack() {
 
         if(gameLevel < 100 && !isPaused) {
             mazeWorld.survivorAttack(inChange);
@@ -343,13 +352,13 @@ public class MazeSurvivorRenderer implements GLSurfaceView.Renderer {
             findExit = false;
             inChange = false;
             canWrite = true;
-            mazeWorld.survivor.isAlive = true;
             updateGame();
             //set the game start time for current round
             gameStartTime = SystemClock.uptimeMillis();
             timeUsed = 0;
 
             isPaused = false;
+            mazeWorld.survivor.isAlive = true;
         }
     }
 

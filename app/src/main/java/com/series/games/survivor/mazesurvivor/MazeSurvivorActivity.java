@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.MenuItem;
@@ -30,6 +32,11 @@ public class MazeSurvivorActivity extends Activity {
     private float attackButtonLeftBorder;
     private float bonusTimeLeftBorder;
     private float bonusTimeBottomBorder;
+    //Variables used for recreating sound effects for game
+    private SoundPool sounds;
+    private int sndwalk;
+    private int sndattack;
+    private int sndbonustime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +77,12 @@ public class MazeSurvivorActivity extends Activity {
         bonusTimeLeftBorder = screenWidth / 2;
         bonusTimeBottomBorder = screenWidth + (screenHeight - screenWidth) / 4;
 
+        //used for sounds effect game
+        sounds = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        sndwalk = sounds.load(this, R.raw.walk, 1);
+        sndattack = sounds.load(this, R.raw.fireattack, 1);
+        sndbonustime = sounds.load(this, R.raw.bonustime, 1);
+
         //Create an instance of GLSurfaceView
         //and set it as the content view
         myGLView = new MazeSurvivorView(this, level, ratio, mode);
@@ -100,16 +113,34 @@ public class MazeSurvivorActivity extends Activity {
                 //move survivor to the corresponding direction, by 1 step
                 //Or attack the monster
                 if(x < buttonLeftBorder && y > buttonUpBorder) {
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndwalk, 1, 1, 1, 0, 1);
+                    }
                     myGLView.myRenderer.updateSurvivor("LEFT");
                 } else if(x > buttonRightBorder && y > buttonUpBorder) {
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndwalk, 1, 1, 1, 0, 1);
+                    }
                     myGLView.myRenderer.updateSurvivor("RIGHT");
                 } else if(y < buttonMidBorder && y > buttonUpBorder && x > buttonLeftBorder && x < buttonRightBorder) {
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndwalk, 1, 1, 1, 0, 1);
+                    }
                     myGLView.myRenderer.updateSurvivor("UP");
                 } else if(y > buttonMidBorder && x > buttonLeftBorder && x < buttonRightBorder) {
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndwalk, 1, 1, 1, 0, 1);
+                    }
                     myGLView.myRenderer.updateSurvivor("DOWN");
                 } else if(x > attackButtonLeftBorder && y > screenWidth && y < buttonUpBorder) {//Attack Button touched
-                    myGLView.myRenderer.updateSword();
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndattack, 1, 1, 1, 0, 1);
+                    }
+                    myGLView.myRenderer.updateFireAttack();
                 } else if(x > bonusTimeLeftBorder && x < attackButtonLeftBorder && y > screenWidth && y < bonusTimeBottomBorder) {//BonusTime Button touched
+                    if(myGLView.myRenderer.mazeWorld.survivor.isAlive) {
+                        sounds.play(sndbonustime, 1, 1, 1, 0, 1);
+                    }
                     myGLView.myRenderer.updateChangeTime();
                 } else if(y < screenWidth) {//Game is paused
                     myGLView.myRenderer.updatePausedStatus();

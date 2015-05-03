@@ -13,7 +13,7 @@
     <string name="game_rule">2. Use less time to hit the higher level, maze will change within random time, be careful with the traps.</string>
     <string name="attack_rule">3. Use fire ball to attack monsters.</string>
     <string name="pause_rule">4. Touch the maze to pause the game.</string>
-    <string name="bonus_time_rule">5. Use bonus time sand clock to extend the maze change time by 5 seconds.</string>
+    <string name="bonus_time_rule">5. Use bonus time sand clock to extend the time to change maze by 5 seconds.</string>
     <string name="marathon_mode_rule">6. Marathon Mode: Start with level 1 and record the higher score.</string>
     <string name="exercise_mode_rule">7. Exercise Mode: Choose any level you want to start with, but will not record the score.</string>
 </resources>

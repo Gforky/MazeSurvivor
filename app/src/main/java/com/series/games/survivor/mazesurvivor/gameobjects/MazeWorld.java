@@ -226,8 +226,10 @@ public class MazeWorld {
      */
     public void survivorAttack(boolean inChange) {
 
-        int beKilledMonsters = survivor.attack(maze, mazeGenerator, inChange, monsters);
-        numOfAliveMonsters = numOfAliveMonsters - beKilledMonsters < 0 ? 0 : numOfAliveMonsters - beKilledMonsters;
+        if(!survivor.fireAttack.outForAttack) {//Fire attack is not in active
+            int beKilledMonsters = survivor.attack(maze, mazeGenerator, inChange, monsters);
+            numOfAliveMonsters = numOfAliveMonsters - beKilledMonsters < 0 ? 0 : numOfAliveMonsters - beKilledMonsters;
+        }
     }
 
     /**Function to check the traps' status

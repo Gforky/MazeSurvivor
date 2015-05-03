@@ -43,6 +43,7 @@ public class GameTextures {
     public int pauseAlertTexture;
     public int gameOverAlertTexture;
     public int gameClearAlertTexture;
+    public int restartTexture;
 
     public GameTextures(GL10 gl, Context context) {
 
@@ -117,6 +118,7 @@ public class GameTextures {
         pauseAlertTexture = loadTexture(gl, context, R.drawable.pause);
         gameOverAlertTexture = loadTexture(gl, context, R.drawable.gameover);
         gameClearAlertTexture = loadTexture(gl, context, R.drawable.youwin);
+        restartTexture = loadTexture(gl, context, R.drawable.restart);
     }
 
     /**Function to load the textures
